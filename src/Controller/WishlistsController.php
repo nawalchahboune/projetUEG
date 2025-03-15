@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/myWishlists')]
-#[IsGranted('ROLE_USER')]
+// #[IsGranted('ROLE_USER')]
 class WishlistsController extends AbstractController
 {
     #[Route('', name: 'app_wishlists_index')]

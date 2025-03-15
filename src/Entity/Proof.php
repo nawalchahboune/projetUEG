@@ -69,4 +69,16 @@ class Proof
         $this->buyer = $buyer;
         return $this;
     }
+
+    public function getCongratsMessage(): ?string
+    {
+        return $this->congratsMessage;
+    }
+
+    public function setCongratsMessage(string $congratsMessage): static
+    {
+        $this->congratsMessage = $congratsMessage;
+
+        return $this;
+    }
 }

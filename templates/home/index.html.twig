@@ -1,0 +1,47 @@
+{# filepath: c:\WEBAPP\tp-symfony\projetUEG\templates\entity\index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}All Entities{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>All Entities</h1>
+        {# <a href="{{ path('app_entity_new') }}" class="btn btn-primary">Create New</a> #}
+    </div>
+
+    {% if entities|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entity in entities %}
+                        <tr>
+                            <td>{{ entity.id }}</td>
+                            <td>{{ entity.name }}</td>
+                            <td>{{ entity.createdAt|date('Y-m-d H:i') }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('app_entity_show', {'id': entity.id}) }}" class="btn btn-sm btn-info">View</a>
+                                    <a href="{{ path('app_entity_edit', {'id': entity.id}) }}" class="btn btn-sm btn-warning">Edit</a>
+                                    <form method="post" action="{{ path('app_entity_delete', {'id': entity.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');" style="display: inline-block">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ entity.id) }}">
+                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">No records found</div>
+    {% endif %}
+{% endblock %}

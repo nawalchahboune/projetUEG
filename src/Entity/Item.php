@@ -113,4 +113,9 @@ class Item
         $this->wishlist = $wishlist;
         return $this;
     }
+
+    public function hasPurchased(): ?bool
+    {
+        return $this->hasPurchased;
+    }
 }
