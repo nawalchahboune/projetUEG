@@ -1,0 +1,219 @@
+{# templates/security/signup.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign up{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    :root {
+        --primary-color: #0f1d36;
+        --accent-color: #f6f6f6;
+        --border-radius: 5px;
+    }
+
+    .signup-container {
+        display: flex;
+        min-height: 100vh;
+    }
+
+    .signup-sidebar {
+        flex: 1;
+        background-color: #f5f5f5;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 2rem;
+        position: relative;
+    }
+
+    .signup-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+
+    .signup-form {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+    }
+
+    .signup-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 1rem;
+    }
+
+    .logo {
+        font-family: 'Pacifico', cursive;
+        font-size: 2.5rem;
+        color: white;
+        margin-bottom: 1rem;
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+    }
+
+    .tagline {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: white;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+    }
+
+    .signin-prompt {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 3rem;
+    }
+
+    .signin-link {
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        color: var(--primary-color);
+    }
+
+    .backdrop-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 1;
+    }
+
+    .sidebar-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+    }
+    
+    .footer {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        font-size: 0.8rem;
+        color: #999;
+    }
+
+    .upload-section {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .upload-box {
+        width: 48%;
+        border: 1px dashed #ddd;
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .upload-icon {
+        display: block;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .upload-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="signup-container">
+    <div class="signup-sidebar" style="background-image: url('https://thumbs.dreamstime.com/b/close-up-hands-giving-beautifully-wrapped-gift-to-another-person-scene-conveys-warmth-care-symbolizes-person-352951009.jpg'); background-size: cover; background-position: center;">
+        <div class="backdrop-overlay"></div>
+        <div class="sidebar-content">
+            <div class="logo">GiftWish</div>
+            <div class="tagline">Offrez du bonheur,<br>un cadeau à la fois !</div>
+        </div>
+    </div>
+
+    <div class="signup-content">
+        <div class="signup-form">
+            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: var(--primary-color); text-align: center;">Sign up</h1>
+
+            {% for flash_error in app.flashes('verify_email_error') %}
+                <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+            {% endfor %}
+
+            {{ form_start(registrationForm) }}
+                <div class="form-group">
+                    {{ form_row(registrationForm.email, {
+                        'attr': {'class': 'form-control', 'placeholder': 'Email address'}
+                    }) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_row(registrationForm.plainPassword.first, {
+                        'attr': {'class': 'form-control', 'placeholder': 'Password'}
+                    }) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_row(registrationForm.plainPassword.second, {
+                        'attr': {'class': 'form-control', 'placeholder': 'Repeat password'}
+                    }) }}
+                </div>
+                
+                <div class="upload-section">
+                    <div class="upload-box">
+                        <span class="upload-icon">+</span>
+                        <p>background picture</p>
+                        <button type="button" class="upload-btn">Upload</button>
+                    </div>
+                    
+                    <div class="upload-box">
+                        <span class="upload-icon">+</span>
+                        <p>profile picture</p>
+                        <button type="button" class="upload-btn">Upload</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form_row(registrationForm.agreeTerms) }}
+                </div>
+                
+                <button type="submit" class="signup-btn">Sign up</button>
+            {{ form_end(registrationForm) }}
+            
+            <div class="signin-prompt">
+                <span>Already a member?</span>
+                <a href="{{ path('app_login') }}" class="signin-link">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

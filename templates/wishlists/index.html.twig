@@ -1,0 +1,44 @@
+{# templates/wishlist/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes listes de souhaits{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Mes listes de souhaits</h1>
+
+    <div class="mb-4">
+        <a href="{{ path('app_wishlists_create') }}" class="btn btn-primary">Créer une nouvelle liste</a>
+    </div>
+
+    {% if wishlists is empty %}
+        <div class="alert alert-info">Vous n'avez pas encore créé de liste de souhaits.</div>
+    {% else %}
+        <div class="row">
+            {% for wishlist in wishlists %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ wishlist.name }}</h5>
+                            <p class="card-text">
+                                Date limite: {{ wishlist.deadline ? wishlist.deadline|date('d/m/Y') : 'Non définie' }}
+                            </p>
+                            <p class="card-text">
+                                {{ wishlist.items|length }} item(s)
+                            </p>
+                            <div class="btn-group">
+                                <a href="{{ path('app_wishlist_show',{'id': wishlist.id}) }}" class="btn btn-info">Voir</a>
+                                <a href="{{ path('app_wishlists_edit', {'id': wishlist.id}) }}" class="btn btn-warning">Modifier</a>
+                                <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste?');">
+                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
+                                 <button type="submit" class="btn btn-danger">Supprimer</button>
+                             </form>
+                               </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

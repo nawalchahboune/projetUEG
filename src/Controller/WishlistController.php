@@ -25,7 +25,7 @@ class WishlistController extends AbstractController
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette liste');
         }
         
-        return $this->render('wishlist/show.html.twig', [
+        return $this->render('wishlist/index.html.twig', [
             'wishlist' => $wishlist,
             'items' => $wishlist->getItems(),
         ]);
@@ -132,7 +132,7 @@ class WishlistController extends AbstractController
             $this->addFlash('success', 'Votre liste de souhaits a été supprimée');
         }
         
-        return $this->redirectToRoute('app_wishlists_index');
+        return $this->redirectToRoute('app_home');
     }
 
     #[Route('/{wishlistId}/goToOfficialWebsite/{itemId}', name: 'app_wishlist_go_to_official_website')]

@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer une nouvelle liste de souhaits{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">Créer une nouvelle liste de souhaits</h1>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_label(form.name, 'Nom de la liste') }}
+                        {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Par exemple: Anniversaire, Noël, Mariage...'}}) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.deadline, 'Date limite (optionnelle)') }}
+                        {{ form_widget(form.deadline, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.deadline) }}
+                        <small class="form-text text-muted">Jusqu'à quand cette liste sera-t-elle active?</small>
+                    </div>
+
+                    {% if form.collaborators is defined %}
+                    <div class="mb-3">
+                        {{ form_label(form.collaborators, 'Partagez avec (optionnel)') }}
+                        {{ form_widget(form.collaborators, {'attr': {'class': 'form-select', 'multiple': 'multiple'}} ) }}
+                        {{ form_errors(form.collaborators) }}
+                        <small class="form-text text-muted">Sélectionnez les utilisateurs avec qui vous souhaitez partager cette liste</small>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
+                        <a href="{{ path('app_home') }}" class="btn btn-secondary">Annuler</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i> Créer la liste
+                        </button>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{% if form.collaborators is defined %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Vous pouvez ajouter ici du code JavaScript pour améliorer le sélecteur multiple
+        // Par exemple, intégrer Select2 ou un autre plugin pour un meilleur UX
+    });
+</script>
+{% endif %}
+{% endblock %}

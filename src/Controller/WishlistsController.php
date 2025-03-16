@@ -3,7 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Wishlist;
-use App\Form\WishlistType;
+use App\Controller\WishlistType;
+use App\Repository\WishlistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,20 +15,28 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/myWishlists')]
-// #[IsGranted('ROLE_USER')]
+#[IsGranted('ROLE_USER')]
 class WishlistsController extends AbstractController
 {
-    #[Route('', name: 'app_wishlists_index')]
-    public function index(EntityManagerInterface $entityManager): Response
+    #[Route('/', name: 'app_home')]
+    public function index(WishlistRepository $wishlistRepository): Response
     {
+        // Récupérer l'utilisateur connecté
         $user = $this->getUser();
         
-        $ownedWishlists = $entityManager->getRepository(Wishlist::class)->findBy(['owner' => $user]);
-        $collaborativeWishlists = $user->getCollaborativeWishlists();
+        // Si aucun utilisateur n'est connecté, on affiche une page basique ou on redirige
+        if (!$user) {
+            return $this->render('security/login.html.twig');
+            // Ou rediriger vers la page de login
+            // return $this->redirectToRoute('app_login');
+        }
+        
+        // Récupérer toutes les wishlists dont l'utilisateur est propriétaire
+        $wishlists = $wishlistRepository->findBy(['owner' => $user]);
         
         return $this->render('wishlists/index.html.twig', [
-            'ownedWishlists' => $ownedWishlists,
-            'collaborativeWishlists' => $collaborativeWishlists,
+            'wishlists' => $wishlists,
+
         ]);
     }
 
@@ -44,8 +53,7 @@ class WishlistsController extends AbstractController
             $entityManager->persist($wishlist);
             $entityManager->flush();
             
-            $this->addFlash('success', 'Votre liste de souhaits a été créée avec succès');
-            return $this->redirectToRoute('app_wishlists_index');
+            return $this->redirectToRoute('app_home');
         }
         
         return $this->render('wishlists/create.html.twig', [
@@ -67,8 +75,7 @@ class WishlistsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
             
-            $this->addFlash('success', 'Votre liste de souhaits a été modifiée avec succès');
-            return $this->redirectToRoute('app_wishlists_index');
+            return $this->redirectToRoute('app_home');
         }
         
         return $this->render('wishlists/edit.html.twig', [
@@ -88,11 +95,9 @@ class WishlistsController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$wishlist->getId(), $request->request->get('_token'))) {
             $entityManager->remove($wishlist);
             $entityManager->flush();
-            
-            $this->addFlash('success', 'Votre liste de souhaits a été supprimée');
-        }
+                    }
         
-        return $this->redirectToRoute('app_wishlists_index');
+        return $this->redirectToRoute('app_home');
     }
 
     #[Route('/{id}/getUrl', name: 'app_wishlists_get_url')]

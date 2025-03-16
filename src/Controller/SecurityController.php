@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
-use App\Form\LoginFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,22 +11,47 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class SecurityController extends AbstractController
 {
-    #[Route('/signup', name: 'app_signup')]
-    public function signup(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
+    #[Route('/signup', name: 'app_signup',)]
+    public function signup(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
+        // Check if user is already logged in
+        if ($this->getUser()) {
+            // Redirect to myWishlist page
+            return $this->redirectToRoute('app_home');
+        }
+        
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Handle profile photo upload
+            $profilePhotoFile = $form->get('profilePhoto')->getData();
+            if ($profilePhotoFile) {
+                $originalFilename = pathinfo($profilePhotoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$profilePhotoFile->guessExtension();
+                
+                try {
+                    $profilePhotoFile->move(
+                        $this->getParameter('profile_photos_directory'),
+                        $newFilename
+                    );
+                    $user->setPhoto($newFilename);
+                } catch (\Exception $e) {
+                    // Handle exception if file upload fails
+                }
+            }
+
             // Encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
-                    $form->get('plainPassword')->getData()
+                    $form->get('plainPassword')->first->getData()
                 )
             );
 
@@ -42,27 +66,28 @@ class SecurityController extends AbstractController
             'registrationForm' => $form,
         ]);
     }
-
-    #[Route('/login', name: 'app_login')]
+    #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // get the login error if there is one
+        // Check if user is already logged in
+    if ($this->getUser()) {
+        // Redirect to myWishlist page
+        return $this->redirectToRoute('app_home');
+    }
         $error = $authenticationUtils->getLastAuthenticationError();
-        
-        // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
-            'error' => $error,
+            'error' => $error
         ]);
     }
 
-    #[Route('/deconnect', name: 'app_logout')]
+    #[Route('/disconnect', name: 'app_logout')]
     public function logout(): void
     {
-        // The logout action is handled by Symfony's security system
-        // This method won't be executed
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    // This method can be empty - it will be intercepted by the logout key on your firewall
+    // The actual logout logic is handled by Symfony's security system
+    throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }

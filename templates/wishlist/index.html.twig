@@ -1,0 +1,196 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ wishlist.name }} - Liste de souhaits{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <!-- Informations sur la wishlist -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ wishlist.name }}</h1>
+            {% if wishlist.deadline %}
+                <p class="text-muted">
+                    <i class="fas fa-calendar-alt me-2"></i> Échéance: {{ wishlist.deadline|date('d/m/Y') }}
+                    {% if date() > wishlist.deadline %}
+                        <span class="badge bg-danger ms-2">Expirée</span>
+                    {% elseif date() > date(wishlist.deadline).modify('-7 days') %}
+                        <span class="badge bg-warning ms-2">Bientôt terminée</span>
+                    {% endif %}
+                </p>
+            {% endif %}
+            
+            {% if is_granted('EDIT', wishlist) %}
+                <div class="btn-group mb-3">
+                    <a href="{{ path('app_wishlist_edit', {'id': wishlist.id}) }}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit me-1"></i> Modifier la liste
+                    </a>
+                    <a href="{{ path('app_home', {'wishlist_id': wishlist.id}) }}" class="btn btn-outline-success">
+                        <i class="fas fa-plus me-1"></i> Ajouter un article
+                    </a>
+                    
+                    <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" 
+                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste de souhaits?');"
+                          style="display: inline;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-trash me-1"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+            
+            <!-- Collaborateurs -->
+            {% if wishlist.collaborators.count > 0 %}
+                <div class="mt-3">
+                    <h5>Partagée avec :</h5>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for user in wishlist.collaborators %}
+                            <span class="badge bg-secondary">
+                                {% if user.photo %}
+                                    <img src="{{ asset('uploads/photos/' ~ user.photo) }}" class="rounded-circle me-1" width="20" height="20" alt="{{ user.username }}">
+                                {% else %}
+                                    <i class="fas fa-user me-1"></i>
+                                {% endif %}
+                                {{ user.username }}
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4 text-end">
+            {% if wishlist.owner == app.user %}
+                <span class="badge bg-info">Ma liste</span>
+            {% else %}
+                <p>
+                    <strong>Créée par :</strong>
+                    {% if wishlist.owner.photo %}
+                        <img src="{{ asset('uploads/photos/' ~ wishlist.owner.photo) }}" class="rounded-circle me-1" width="24" height="24" alt="{{ wishlist.owner.username }}">
+                    {% endif %}
+                    {{ wishlist.owner.username }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Liste des articles -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0">Articles ({{ wishlist.items|length }})</h2>
+            {% if is_granted('EDIT', wishlist) %}
+                <a href="{{ path('app_home', {'wishlist_id': wishlist.id}) }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i> Nouvel article
+                </a>
+            {% endif %}
+        </div>
+        
+        <div class="card-body">
+            {% if wishlist.items|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Article</th>
+                                <th>Prix</th>
+                                <th>Statut</th>
+                                {% if not is_granted('EDIT', wishlist) %}
+                                    <th>Actions</th>
+                                {% else %}
+                                    <th>Actions</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in wishlist.items %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if item.hasPurchased and not is_granted('EDIT', wishlist) %}
+                                                <del class="text-muted">{{ item.name }}</del>
+                                            {% else %}
+                                                <strong>{{ item.name }}</strong>
+                                            {% endif %}
+                                            
+                                            {% if item.description %}
+                                                <button type="button" class="btn btn-sm btn-link ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ item.description }}">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                        {% if item.url %}
+                                            <a href="{{ item.url }}" target="_blank" class="small text-decoration-none">
+                                                <i class="fas fa-external-link-alt me-1"></i>Voir le lien
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.price|number_format(2, ',', ' ') }} €</td>
+                                    <td>
+                                        {% if item.hasPurchased %}
+                                            <span class="badge bg-success">Réservé</span>
+                                            {% if item.proof %}
+                                                <span class="badge bg-info ms-1">Acheté</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">Disponible</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if is_granted('EDIT', wishlist) %}
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ path('app_home', {'id': item.id}) }}" class="btn btn-outline-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form method="post" action="{{ path('app_home', {'id': item.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article?');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
+                                                    <button type="submit" class="btn btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        {% else %}
+                                            {% if not item.hasPurchased %}
+                                                <a href="{{ path('app_home', {'id': item.id}) }}" class="btn btn-sm btn-success">
+                                                    <i class="fas fa-gift me-1"></i> Réserver
+                                                </a>
+                                            {% elseif item.hasPurchased and item.proof and item.proof.buyer == app.user %}
+                                                <a href="{{ path('app_home', {'id': item.proof.id}) }}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-edit me-1"></i> Modifier preuve
+                                                </a>
+                                            {% elseif item.hasPurchased and not item.proof and app.user %}
+                                                <a href="{{ path('app_home', {'item_id': item.id}) }}" class="btn btn-sm btn-outline-info">
+                                                    <i class="fas fa-check-circle me-1"></i> Confirmer achat
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Cette liste ne contient aucun article pour le moment.
+                    {% if is_granted('EDIT', wishlist) %}
+                        <a href="{{ path('app_home') }}" class="alert-link">Ajouter votre premier article</a>.
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialisation des tooltips Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>
+{% endblock %}
