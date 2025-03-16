@@ -1,10 +1,8 @@
-{# templates/security/signup.html.twig #}
-{% extends 'base.html.twig' %}
+{# Add this temporarily at the top of your template #}
 
 {% block title %}Sign up{% endblock %}
 
 {% block stylesheets %}
-{{ parent() }}
 <style>
     :root {
         --primary-color: #0f1d36;
@@ -138,20 +136,36 @@
         margin-bottom: 0.5rem;
     }
 
+    .hidden-file-input {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+    
     .upload-btn {
+        display: inline-block;
         background-color: var(--primary-color);
         color: white;
         border: none;
         border-radius: var(--border-radius);
-        padding: 0.5rem;
+        padding: 0.5rem 1rem;
         margin-top: 0.5rem;
         font-size: 0.8rem;
         cursor: pointer;
+        text-align: center;
+    }
+    
+    .upload-btn:hover {
+        background-color: #1a2e4c;
     }
 </style>
 {% endblock %}
 
 {% block body %}
+
 <div class="signup-container">
     <div class="signup-sidebar" style="background-image: url('https://thumbs.dreamstime.com/b/close-up-hands-giving-beautifully-wrapped-gift-to-another-person-scene-conveys-warmth-care-symbolizes-person-352951009.jpg'); background-size: cover; background-position: center;">
         <div class="backdrop-overlay"></div>
@@ -168,8 +182,7 @@
             {% for flash_error in app.flashes('verify_email_error') %}
                 <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
             {% endfor %}
-
-            {{ form_start(registrationForm) }}
+            {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
                 <div class="form-group">
                     {{ form_row(registrationForm.email, {
                         'attr': {'class': 'form-control', 'placeholder': 'Email address'}
@@ -187,18 +200,15 @@
                         'attr': {'class': 'form-control', 'placeholder': 'Repeat password'}
                     }) }}
                 </div>
-                
                 <div class="upload-section">
                     <div class="upload-box">
                         <span class="upload-icon">+</span>
-                        <p>background picture</p>
-                        <button type="button" class="upload-btn">Upload</button>
-                    </div>
-                    
-                    <div class="upload-box">
-                        <span class="upload-icon">+</span>
                         <p>profile picture</p>
-                        <button type="button" class="upload-btn">Upload</button>
+                        {{ form_widget(registrationForm.profilePhoto, {
+                            'attr': {'class': 'hidden-file-input', 'id': 'profile-photo-input', 'style': 'display:none;'}
+                        }) }}
+                        <label for="profile-photo-input" class="upload-btn">Upload</label>
+                        <div id="file-name-display" class="mt-2 text-sm"></div>
                     </div>
                 </div>
                 
@@ -216,4 +226,18 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var fileInput = document.getElementById('profile-photo-input');
+        var fileNameDisplay = document.getElementById('file-name-display');
+        
+        if (fileInput && fileNameDisplay) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    fileNameDisplay.textContent = this.files[0].name;
+                }
+            });
+        }
+    });
+    </script>
 {% endblock %}

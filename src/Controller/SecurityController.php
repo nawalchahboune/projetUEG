@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
+
 class SecurityController extends AbstractController
 {
     #[Route('/signup', name: 'app_signup',)]
@@ -46,13 +47,11 @@ class SecurityController extends AbstractController
                     // Handle exception if file upload fails
                 }
             }
-
             // Encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
-                    $form->get('plainPassword')->first->getData()
-                )
+                    $form['plainPassword']['first']->getData())
             );
 
             $entityManager->persist($user);
@@ -63,7 +62,7 @@ class SecurityController extends AbstractController
         }
 
         return $this->render('security/signup.html.twig', [
-            'registrationForm' => $form,
+            'registrationForm' => $form->createView(),
         ]);
     }
     #[Route(path: '/login', name: 'app_login')]
