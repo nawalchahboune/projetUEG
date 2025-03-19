@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Search Results for "{{ query }}"</h1>
+        
+        <div class="my-4">
+            <form action="{{ path('app_gift_search') }}" method="GET" class="d-flex">
+                <input type="text" name="q" class="form-control" value="{{ query }}" placeholder="Search for gifts..." aria-label="Search">
+                <button class="btn btn-primary ms-2" type="submit">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+        
+        {% if results|length > 0 %}
+            <div class="row">
+                {% for result in results %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ result.name }}</h5>
+                                <p class="card-text">{{ result.description }}</p>
+                                <a href="#" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No gifts found matching "{{ query }}". Try a different search term.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
