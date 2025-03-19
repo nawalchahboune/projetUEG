@@ -1,13 +1,13 @@
 /* Global styles */
 :root {
-    --primary-color: #3f51b5;
+    --primary-color: #00B8DE;
     --secondary-color: #ff4081;
-    --dark-color: #212121;
+    --dark-color: #14223C;
     --light-color: #f5f5f5;
-    --success-color: #4caf50;
+    --success-color: #9ACC99;
     --info-color: #2196f3;
     --warning-color: #ff9800;
-    --danger-color: #f44336;
+    --danger-color: #a12d25;
 }
 
 body {
@@ -38,7 +38,7 @@ body {
 /* Search container styling */
 .search-container {
     background-color: white;
-    padding: 20px;
+    padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -69,4 +69,17 @@ footer {
 .alert-danger {
     background-color: var(--danger-color);
     color: white;
+}
+
+.brand-logo {
+    font-family: 'Pacifico', cursive;
+}
+
+.nav-item{
+    color: var(--light-color);
+}
+
+.btn-primary, .btn-primary:hover {
+    background-color: var(--light-color);
+    color: var(--dark-color);
 }
