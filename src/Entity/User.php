@@ -54,6 +54,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, GlobalM
     #[ORM\Column(type: 'string', length: 20)]
     private ?string $type = 'user';
 
+    private ?Invitation $invitation = null;
+
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Wishlist::class, orphanRemoval: true)]
     private Collection $ownedWishlists;
 

@@ -15,8 +15,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class AdminController extends AbstractController
 {
-    #[Route('/dashboard', name: 'admin_dashboard')]
-    public function dashboard(
+    #[Route('/top3', name: 'admin_top3')]
+    public function top3(
         ItemRepository $itemRepo,
         WishlistRepository $wishlistRepo
     ): Response {
@@ -26,9 +26,17 @@ class AdminController extends AbstractController
         // (b) Top-3 wishlists by total value of purchased gifts
         $topWishlists = $wishlistRepo->findTop3WishlistsByTotalValue();
 
-        return $this->render('admin/dashboard.html.twig', [
+        return $this->render('admin/top3.html.twig', [
             'topItems' => $topExpensiveItems,
             'topWishlists' => $topWishlists,
+        ]);
+    }
+
+    #[Route('/dashboard', name: 'admin_dashboard')]
+    public function dashboard(): Response
+    {
+        return $this->render('admin/dashboard.html.twig', [
+            'controller_name' => 'AdminController',
         ]);
     }
 
