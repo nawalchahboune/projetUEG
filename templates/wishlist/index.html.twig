@@ -118,6 +118,17 @@
         font-weight: 600;
         font-size: 0.9rem;
     }
+    .delete-btn {
+     position: absolute;
+     top: 1rem;
+     left: 1rem; /* Changed from right to left */
+     background-color: #c53030;
+     color: white;
+     padding: 0.4rem 0.8rem;
+     border-radius: 20px;
+     font-weight: 600;
+     font-size: 0.9rem;
+ }
     
     .item-status {
         position: absolute;
@@ -385,30 +396,11 @@
     </div>
     
     <div class="share-options">
-        <button class="share-btn share-facebook">
-            <i class="fab fa-facebook-f"></i>
-            <span>Facebook</span>
-        </button>
-        
-        <button class="share-btn share-twitter">
-            <i class="fab fa-twitter"></i>
-            <span>Twitter</span>
-        </button>
-        
-        <button class="share-btn share-whatsapp">
-            <i class="fab fa-whatsapp"></i>
-            <span>WhatsApp</span>
-        </button>
-        
-        <button class="share-btn share-email">
-            <i class="fas fa-envelope"></i>
-            <span>Email</span>
-        </button>
-        
-        <button class="share-btn share-link" id="copy-link-btn">
-            <i class="fas fa-link"></i>
-            <span>Copier le lien</span>
-        </button>
+ 
+  <button class="share-btn add-item-btn">
+   <i class="fas fa-plus-circle"></i>
+   <span>Add Item</span>
+</button>
     </div>
     
     <div class="items-grid">
@@ -421,13 +413,11 @@
                             <div class="item-price">{{ item.price|number_format(2, ',', ' ') }} €</div>
                         {% endif %}
                         
-                        <div class="item-status {% if item.isPurchased|default(false) %}status-purchased{% else %}status-available{% endif %}">
-                            {% if item.isPurchased|default(false) %}
-                                Réservé
-                            {% else %}
-                                Disponible
-                            {% endif %}
-                        </div>
+                              
+     <button class="delete-btn">
+      <i class="fas fa-trash"></i>
+      <span>Delete</span>
+  </button>
                         
                         {% if item.isPurchased|default(false) %}
                             <div class="purchased-overlay">
