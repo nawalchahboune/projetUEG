@@ -56,9 +56,6 @@ class Proof
         $this->congratsMessage = $message;
         return $this;
     }
-
-   
-
     public function getBuyer(): ?User
     {
         return $this->buyer;
