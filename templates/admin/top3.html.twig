@@ -1,0 +1,60 @@
+{# filepath: templates/admin/top3.html.twig #}
+{% extends 'admin/dashboard.html.twig' %}
+
+{% block title %}Top 3 Statistics - GiftWish Admin{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+{% endblock %}
+
+{% block admin_body %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">Top 3 Statistics</h1>
+        <p class="text-muted">View top items and wishlists data</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Top 3 Most Expensive Items -->
+        <div class="col-md-6">
+            <h4 class="mb-3">Top 3 Most Expensive Items</h4>
+            <div class="list-group shadow-sm">
+                {% for item in topItems %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ item.name }}</h5>
+                            <small>Recipient: {{ item.recipientName }}</small>
+                        </div>
+                        <span class="badge bg-primary">{{ item.price|number_format(2) }} $</span>
+                    </div>
+                {% else %}
+                    <div class="list-group-item">No items found.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Top 3 Wishlists by Total Value -->
+        <div class="col-md-6">
+            <h4 class="mb-3">Top 3 Wishlists by Total Value</h4>
+            <div class="list-group shadow-sm">
+                {% for wishlist in topWishlists %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ wishlist.name }}</h5>
+                            <small>Owner: {{ wishlist.ownerName }}</small>
+                        </div>
+                        <span class="badge bg-success">Total Purchased: {{ wishlist.totalValue|number_format(2) }} $</span>
+                    </div>
+                {% else %}
+                    <div class="list-group-item">No wishlists found.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ path('admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
