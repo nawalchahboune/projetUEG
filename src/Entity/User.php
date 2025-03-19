@@ -264,7 +264,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, GlobalM
     // MyWishlistListPage interface methods
     public function createWishlist(string $title, ?\DateTimeInterface $deadline): ?Wishlist
     {
-        $wishlist = new Wishlist();
+        $wishlist = new Wishlist($title, $deadline);
         $wishlist->setName($title);
         $wishlist->setDeadline($deadline);
         $wishlist->setOwner($this);

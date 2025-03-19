@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 enum NotificationType: string {
     case Invitation = 'invitation'; // accepted or refused
-    case Purchase = 'purchase'; // accepted or refused
+    case Purchase = 'purchase';
     case Proof = 'proof';
 
     public function handleNotification(Notification $notification): void
@@ -47,7 +47,7 @@ class Notification
     #[ORM\Column(type: 'string', enumType: NotificationType::class)]
     private NotificationType $type;
     
-    #[ORM\ManyToOne(targetEntity: Invitation::class)]
+    #[ORM\ManyToOne(targetEntity: Invitation::class, cascade: ['persist'])]
     private ?Invitation $invitation = null;
     
     #[ORM\ManyToOne(targetEntity: Item::class)]
