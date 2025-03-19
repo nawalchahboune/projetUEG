@@ -1,47 +1,68 @@
-{# filepath: c:\WEBAPP\tp-symfony\projetUEG\templates\entity\index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}All Entities{% endblock %}
+{% block title %}GiftWish - Home{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+{% endblock %}
 
 {% block body %}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>All Entities</h1>
-        {# <a href="{{ path('app_entity_new') }}" class="btn btn-primary">Create New</a> #}
-    </div>
-
-    {% if entities|length > 0 %}
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for entity in entities %}
-                        <tr>
-                            <td>{{ entity.id }}</td>
-                            <td>{{ entity.name }}</td>
-                            <td>{{ entity.createdAt|date('Y-m-d H:i') }}</td>
-                            <td>
-                                <div class="btn-group" role="group">
-                                    <a href="{{ path('app_entity_show', {'id': entity.id}) }}" class="btn btn-sm btn-info">View</a>
-                                    <a href="{{ path('app_entity_edit', {'id': entity.id}) }}" class="btn btn-sm btn-warning">Edit</a>
-                                    <form method="post" action="{{ path('app_entity_delete', {'id': entity.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');" style="display: inline-block">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ entity.id) }}">
-                                        <button class="btn btn-sm btn-danger">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-8 text-center">
+                <h1 class="display-4 mb-4">Welcome to GiftWish</h1>
+                <p class="lead mb-5">Discover the perfect gift from a wishlist</p>
+                
+                <div class="search-container mb-5">
+                    <form action="{{ path('app_gift_search') }}" method="GET" class="d-flex">
+                        <input type="text" name="q" class="form-control form-control-lg" placeholder="Search for gifts..." aria-label="Search">
+                        <button class="btn btn-primary btn-lg ms-2" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-    {% else %}
-        <div class="alert alert-info">No records found</div>
-    {% endif %}
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-gift fa-3x mb-3 text-primary"></i>
+                        <h3>Create Wishlists</h3>
+                        <p>Create your personal wishlist and share it with friends and family.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-search fa-3x mb-3 text-primary"></i>
+                        <h3>Discover Gifts</h3>
+                        <p>Explore gift ideas and find inspiration for special occasions.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                        <h3>Connect</h3>
+                        <p>Join events and connect with friends to exchange gifts.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if not is_granted('ROLE_USER') %}
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <p class="lead">Get started today:</p>
+                <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg mx-2">Log In</a>
+                <a href="{{ path('app_signup') }}" class="btn btn-outline-primary btn-lg mx-2">Sign Up</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 {% endblock %}
