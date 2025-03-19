@@ -1,6 +1,8 @@
 <?php
 
-use App\Entity\Invitation; // Adjust the namespace as needed
+namespace App\Interfaces;
+
+use App\Entity\Invitation;
 
 interface myInvitationPage
 {

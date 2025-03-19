@@ -44,6 +44,10 @@ class ItemRepository extends ServiceEntityRepository
     public function findTop3MostExpensiveItems(): array
     {
         return $this->createQueryBuilder('i')
+            ->select('i.id', 'i.name', 'i.price', 'u.username as recipientName')
+            ->join('i.wishlist', 'w')
+            ->join('w.owner', 'u')  // the owner of the wishlist is the recipient
+            ->where('i.isPurchased = true')
             ->orderBy('i.price', 'DESC')
             ->setMaxResults(3)
             ->getQuery()
