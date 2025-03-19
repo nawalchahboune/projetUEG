@@ -1,0 +1,56 @@
+{# templates/admin/dashboard.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard - GiftWish{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">Administrator</h1>
+        <p class="text-muted">Manage top items and wishlists</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Top 3 Most Expensive Items -->
+        <div class="col-md-6">
+            <h4 class="mb-3">Top 3 Most Expensive Items</h4>
+            <div class="list-group shadow-sm">
+                {% for item in topItems %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ item.name }}</h5>
+                            <small>Recipient: {{ item.recipientName }}</small>
+                        </div>
+                        <span class="badge bg-primary">{{ item.price|number_format(2) }} $</span>
+                    </div>
+                {% else %}
+                    <div class="list-group-item">No items found.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Top 3 Wishlists by Total Value -->
+        <div class="col-md-6">
+            <h4 class="mb-3">Top 3 Wishlists by Total Value</h4>
+            <div class="list-group shadow-sm">
+                {% for wishlist in topWishlists %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ wishlist.name }}</h5>
+                            <small>Owner: {{ wishlist.ownerName }}</small>
+                        </div>
+                        <span class="badge bg-success">Total Purchased: {{ wishlist.totalValue|number_format(2) }} $</span>
+                    </div>
+                {% else %}
+                    <div class="list-group-item">No wishlists found.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

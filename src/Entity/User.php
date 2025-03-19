@@ -221,8 +221,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // Required methods for UserInterface
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        $roles = ['ROLE_USER'];
+        if ($this->type === 'admin') {
+            $roles[] = 'ROLE_ADMIN';
+        }
+        return array_unique($roles);
     }
+
 
     public function eraseCredentials(): void
     {
