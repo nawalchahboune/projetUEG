@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -29,23 +29,48 @@ enum NotificationType: string {
     }
 }
 
+#[ORM\Entity(repositoryClass: NotificationRepository::class)]
+#[ORM\Table(name: 'notification')]
 class Notification
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
+    
+    #[ORM\ManyToOne(targetEntity: User::class)]
     private ?User $sender;
-    #[ORM\OneToOne(inversedBy: 'myNotifications', targetEntity: User::class, orphanRemoval: true)]
+    
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'receivedNotifications')]
     private ?User $recipient;
+    
+    #[ORM\Column(type: 'string', enumType: NotificationType::class)]
     private NotificationType $type;
-    private ?Invitation $invitation;
-    private ?Item $item;
-    private string $message;
+    
+    #[ORM\ManyToOne(targetEntity: Invitation::class)]
+    private ?Invitation $invitation = null;
+    
+    #[ORM\ManyToOne(targetEntity: Item::class)]
+    private ?Item $item = null;
+    
+    #[ORM\Column(type: 'text')]
+    private string $message = '';
+    
+    #[ORM\Column(type: 'datetime')]
+    private \DateTimeInterface $createdAt;
 
     public function __construct(?User $sender, ?User $recipient, NotificationType $type)
     {
         $this->sender = $sender;
         $this->recipient = $recipient;
         $this->type = $type;
+        $this->createdAt = new \DateTime();
     }
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
     public function send(): void
     {
@@ -56,11 +81,11 @@ class Notification
     {
         if($this->invitation->isAccepted() == true)
         {
-            $this->message = $this->sender->getUsername() ."a accépté votre invitation";
+            $this->message = $this->sender->getUsername() ." a accepté votre invitation";
         }
         else
         {
-            $this->message = $this->sender->getUsername() ."a refusé votre invitation";
+            $this->message = $this->sender->getUsername() ." a refusé votre invitation";
         }
     }
 
@@ -71,7 +96,7 @@ class Notification
 
     public function sendProofNotif(): void
     {
-        $this->message ="Votre preuve a été validé pour l'item " . $this->item->getName();
+        $this->message ="Votre preuve a été validée pour l'item " . $this->item->getName();
     }
     
     public function getSender(): ?User
@@ -92,5 +117,50 @@ class Notification
     public function setRecipient(?User $recipient): void
     {
         $this->recipient = $recipient;
+    }
+    
+    public function getType(): NotificationType
+    {
+        return $this->type;
+    }
+    
+    public function setType(NotificationType $type): void
+    {
+        $this->type = $type;
+    }
+    
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+    
+    public function setMessage(string $message): void
+    {
+        $this->message = $message;
+    }
+    
+    public function getInvitation(): ?Invitation
+    {
+        return $this->invitation;
+    }
+    
+    public function setInvitation(?Invitation $invitation): void
+    {
+        $this->invitation = $invitation;
+    }
+    
+    public function getItem(): ?Item
+    {
+        return $this->item;
+    }
+    
+    public function setItem(?Item $item): void
+    {
+        $this->item = $item;
+    }
+    
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->createdAt;
     }
 }

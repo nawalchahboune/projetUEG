@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Repository\InvitationRepository;
+use App\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InvitationRepository::class)]
@@ -20,8 +21,8 @@ class Invitation
 
     private ?User $sender = null;
 
-    #[ORM\OneToMany(inversedBy: 'myInvitations', targetEntity: User::class, orphanRemoval: true)]
-    private Collection $receivers;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'myInvitations')]
+    private ?User $receiver;
 
     private ?bool $accepted = null;
 
