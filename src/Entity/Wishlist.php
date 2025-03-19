@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\WishlistRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -34,7 +35,7 @@ class Wishlist
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'collaborativeWishlists')]
     private Collection $collaborators;
 
-    public function __construct(string $name = null, \DateTimeInterface $deadline = null)
+    public function __construct(?string $name, ?DateTimeInterface $deadline )
     {
         $this->name = $name;
         $this->deadline = $deadline;

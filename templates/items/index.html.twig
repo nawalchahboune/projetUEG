@@ -1,0 +1,317 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ item.name }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .item-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .item-detail {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-top: 2rem;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    @media (max-width: 768px) {
+        .item-detail {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .item-detail-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        max-height: 500px;
+    }
+    
+    .item-detail-content {
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .item-detail-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0f1d36;
+        margin-bottom: 1rem;
+    }
+    
+    .item-detail-price {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0f1d36;
+        margin-bottom: 2rem;
+    }
+    
+    .item-detail-description {
+        color: #444;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .item-detail-info {
+        background-color: #f9f9f9;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .item-info-row {
+        display: flex;
+        margin-bottom: 0.8rem;
+    }
+    
+    .item-info-label {
+        font-weight: 600;
+        width: 150px;
+        color: #555;
+    }
+    
+    .item-detail-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: auto;
+    }
+    
+    .primary-btn {
+        padding: 0.8rem 1.5rem;
+        background-color: #0f1d36;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .primary-btn:hover {
+        background-color: #1a2e4c;
+    }
+    
+    .secondary-btn {
+        padding: 0.8rem 1.5rem;
+        background-color: white;
+        color: #0f1d36;
+        border: 1px solid #0f1d36;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .secondary-btn:hover {
+        background-color: #f5f5f5;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        color: #555;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    
+    .back-link:hover {
+        color: #0f1d36;
+    }
+    
+    .back-link i {
+        margin-right: 0.5rem;
+    }
+    
+    /* Pour les features spécifiques de l'item */
+    .item-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .feature-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .feature-icon {
+        font-size: 2.5rem;
+        color: #0f1d36;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-description {
+        color: #666;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="item-detail-container">
+    <a href="{{ path('app_items') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> Retour aux cadeaux
+    </a>
+
+    <div class="item-detail">
+        <div class="item-image-wrapper">
+            {% if item.imageUrl %}
+                <img src="{{ item.imageUrl }}" alt="{{ item.name }}" class="item-detail-image">
+            {% else %}
+                <img src="{{ asset('images/gift-placeholder.jpg') }}" alt="Image non disponible" class="item-detail-image">
+            {% endif %}
+        </div>
+        
+        <div class="item-detail-content">
+            <h1 class="item-detail-title">{{ item.name }}</h1>
+            
+            {% if item.price %}
+                <div class="item-detail-price">{{ item.price|number_format(2, ',', ' ') }} €</div>
+            {% endif %}
+            
+            <div class="item-detail-description">
+                {{ item.description|default('Aucune description disponible') }}
+            </div>
+            
+            <div class="item-detail-info">
+                {% if item.category %}
+                <div class="item-info-row">
+                    <div class="item-info-label">Catégorie:</div>
+                    <div>{{ item.category.name }}</div>
+                </div>
+                {% endif %}
+                
+                {% if item.storeLink %}
+                <div class="item-info-row">
+                    <div class="item-info-label">Où l'acheter:</div>
+                    <div><a href="{{ item.storeLink }}" target="_blank">Voir en boutique</a></div>
+                </div>
+                {% endif %}
+                
+                <div class="item-info-row">
+                    <div class="item-info-label">Ajouté par:</div>
+                    <div>{{ item.user ? item.user.username : 'Utilisateur inconnu' }}</div>
+                </div>
+                
+                <div class="item-info-row">
+                    <div class="item-info-label">Date d'ajout:</div>
+                    <div>{{ item.createdAt ? item.createdAt|date('d/m/Y') : 'Date inconnue' }}</div>
+                </div>
+            </div>
+            
+            <div class="item-detail-actions">
+                {% if app.user %}
+                    <button class="primary-btn" id="add-to-wishlist-btn">
+                        <i class="fa-{% if item in app.user.wishlist %}solid{% else %}regular{% endif %} fa-heart"></i>
+                        {% if item in app.user.wishlist %}
+                            Retirer de ma liste
+                        {% else %}
+                            Ajouter à ma liste
+                        {% endif %}
+                    </button>
+                {% endif %}
+                
+                {% if item.storeLink %}
+                    <a href="{{ item.storeLink }}" target="_blank" class="secondary-btn">
+                        <i class="fas fa-shopping-cart"></i> Acheter maintenant
+                    </a>
+                {% endif %}
+                
+                {% if app.user and (app.user == item.user or is_granted('ROLE_ADMIN')) %}
+                    <a href="#" class="secondary-btn">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="item-features">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-gift"></i>
+            </div>
+            <h3 class="feature-title">Idéal pour offrir</h3>
+            <p class="feature-description">Un cadeau parfait pour faire plaisir à vos proches.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-medal"></i>
+            </div>
+            <h3 class="feature-title">Qualité garantie</h3>
+            <p class="feature-description">Des produits sélectionnés pour leur qualité et leur durabilité.</p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-truck"></i>
+            </div>
+            <h3 class="feature-title">Livraison rapide</h3>
+            <p class="feature-description">Commandez directement depuis les sites partenaires pour une livraison rapide.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const wishlistBtn = document.getElementById('add-to-wishlist-btn');
+        
+        if (wishlistBtn) {
+            wishlistBtn.addEventListener('click', function() {
+                // On pourrait ajouter ici une requête AJAX pour mettre à jour la liste de souhaits
+                
+                // Animation visuelle temporaire
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-regular');
+                icon.classList.toggle('fa-solid');
+                
+                // Mettre à jour le texte du bouton
+                const text = this.textContent.trim();
+                if (text.includes('Ajouter')) {
+                    this.innerHTML = this.innerHTML.replace('Ajouter à ma liste', 'Retirer de ma liste');
+                } else {
+                    this.innerHTML = this.innerHTML.replace('Retirer de ma liste', 'Ajouter à ma liste');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

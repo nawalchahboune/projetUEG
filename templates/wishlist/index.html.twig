@@ -2,182 +2,473 @@
 
 {% block title %}{{ wishlist.name }} - Liste de souhaits{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .shared-wishlist-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .shared-header {
+        background-color: #f9f9f9;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        text-align: center;
+        position: relative;
+    }
+    
+    .shared-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #0f1d36;
+        margin-bottom: 1rem;
+    }
+    
+    .shared-description {
+        color: #666;
+        font-size: 1.1rem;
+        max-width: 800px;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .shared-meta {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        color: #777;
+        font-size: 0.9rem;
+    }
+    
+    .shared-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .user-info {
+        background-color: white;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 1.5rem auto;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: #0f1d36;
+    }
+    
+    /* Items grid */
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    
+    .item-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: white;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    
+    .item-image-container {
+        position: relative;
+        height: 180px;
+        overflow: hidden;
+    }
+    
+    .item-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .item-card:hover .item-image {
+        transform: scale(1.05);
+    }
+    
+    .item-price {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: #0f1d36;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .item-status {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.8rem;
+        z-index: 1;
+    }
+    
+    .status-available {
+        background-color: #e3f7e3;
+        color: #2c7a2c;
+    }
+    
+    .status-purchased {
+        background-color: #ffe9e9;
+        color: #c53030;
+    }
+    
+    .purchased-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .purchased-text {
+        background-color: #c53030;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        font-weight: 600;
+        transform: rotate(-15deg);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .item-content {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .item-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #0f1d36;
+        margin-bottom: 0.5rem;
+    }
+    
+    .item-description {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+    }
+    
+    .item-priority {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .priority-label {
+        font-size: 0.85rem;
+        color: #777;
+    }
+    
+    .priority-indicator {
+        flex-grow: 1;
+        height: 5px;
+        background-color: #eee;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .priority-bar {
+        height: 100%;
+        background-color: #0f1d36;
+    }
+    
+    .priority-high .priority-bar {
+        width: 100%;
+    }
+    
+    .priority-medium .priority-bar {
+        width: 60%;
+    }
+    
+    .priority-low .priority-bar {
+        width: 30%;
+    }
+    
+    .item-action {
+        margin-top: auto;
+    }
+    
+    .purchase-btn {
+        width: 100%;
+        padding: 0.8rem;
+        background-color: #0f1d36;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .purchase-btn:hover {
+        background-color: #1a2e4c;
+    }
+    
+    .purchase-btn.disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    
+    .view-btn {
+        width: 100%;
+        padding: 0.8rem;
+        background-color: white;
+        color: #0f1d36;
+        border: 1px solid #0f1d36;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .view-btn:hover {
+        background-color: #f5f5f5;
+    }
+    
+    .empty-wishlist {
+        grid-column: 1 / -1;
+        padding: 3rem;
+        text-align: center;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        margin-top: 2rem;
+    }
+    
+    .empty-title {
+        font-size: 1.5rem;
+        color: #0f1d36;
+        margin-bottom: 1rem;
+    }
+    
+    .return-home {
+        padding: 0.7rem 1.2rem;
+        background-color: #0f1d36;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .return-home:hover {
+        background-color: #1a2e4c;
+    }
+    
+    .share-options {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+    
+    .share-btn {
+        padding: 0.7rem 1.2rem;
+        background-color: white;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .share-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Button colors for different platforms */
+    .share-facebook {
+        color: #3b5998;
+    }
+    
+    .share-twitter {
+        color: #1da1f2;
+    }
+    
+    .share-whatsapp {
+        color: #25d366;
+    }
+    
+    .share-email {
+        color: #c53030;
+    }
+    
+    .share-link {
+        color: #0f1d36;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-<div class="container mt-4">
-    <!-- Informations sur la wishlist -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1>{{ wishlist.name }}</h1>
-            {% if wishlist.deadline %}
-                <p class="text-muted">
-                    <i class="fas fa-calendar-alt me-2"></i> Échéance: {{ wishlist.deadline|date('d/m/Y') }}
-                    {% if date() > wishlist.deadline %}
-                        <span class="badge bg-danger ms-2">Expirée</span>
-                    {% elseif date() > date(wishlist.deadline).modify('-7 days') %}
-                        <span class="badge bg-warning ms-2">Bientôt terminée</span>
-                    {% endif %}
-                </p>
+<div class="shared-wishlist-container">
+    <div class="shared-header">
+        <h1 class="shared-title">{{ wishlist.name }}</h1>
+        
+        <div class="user-info">
+            {% if wishlist.owner.photo %}
+                <img src="{{ asset('uploads/profile_photos/' ~ wishlist.owner.photo) }}" alt="{{ wishlist.owner.username }}" class="user-avatar">
+            {% else %}
+                <img src="{{ asset('images/default-avatar.jpg') }}" alt="{{ wishlist.owner.username }}" class="user-avatar">
             {% endif %}
-            
-            {% if is_granted('EDIT', wishlist) %}
-                <div class="btn-group mb-3">
-                    <a href="{{ path('app_wishlist_edit', {'id': wishlist.id}) }}" class="btn btn-outline-primary">
-                        <i class="fas fa-edit me-1"></i> Modifier la liste
-                    </a>
-                    <a href="{{ path('app_home', {'wishlist_id': wishlist.id}) }}" class="btn btn-outline-success">
-                        <i class="fas fa-plus me-1"></i> Ajouter un article
-                    </a>
-                    
-                    <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" 
-                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste de souhaits?');"
-                          style="display: inline;">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
-                        <button type="submit" class="btn btn-outline-danger">
-                            <i class="fas fa-trash me-1"></i> Supprimer
-                        </button>
-                    </form>
-                </div>
-            {% endif %}
-            
-            <!-- Collaborateurs -->
-            {% if wishlist.collaborators.count > 0 %}
-                <div class="mt-3">
-                    <h5>Partagée avec :</h5>
-                    <div class="d-flex flex-wrap gap-2">
-                        {% for user in wishlist.collaborators %}
-                            <span class="badge bg-secondary">
-                                {% if user.photo %}
-                                    <img src="{{ asset('uploads/photos/' ~ user.photo) }}" class="rounded-circle me-1" width="20" height="20" alt="{{ user.username }}">
-                                {% else %}
-                                    <i class="fas fa-user me-1"></i>
-                                {% endif %}
-                                {{ user.username }}
-                            </span>
-                        {% endfor %}
-                    </div>
-                </div>
-            {% endif %}
+            <span class="user-name">Liste de {{ wishlist.owner.firstName|default(wishlist.owner.username) }}</span>
         </div>
         
-        <div class="col-md-4 text-end">
-            {% if wishlist.owner == app.user %}
-                <span class="badge bg-info">Ma liste</span>
-            {% else %}
-                <p>
-                    <strong>Créée par :</strong>
-                    {% if wishlist.owner.photo %}
-                        <img src="{{ asset('uploads/photos/' ~ wishlist.owner.photo) }}" class="rounded-circle me-1" width="24" height="24" alt="{{ wishlist.owner.username }}">
-                    {% endif %}
-                    {{ wishlist.owner.username }}
-                </p>
-            {% endif %}
+        <div class="shared-meta">
+            <div class="shared-meta-item">
+                <i class="fas fa-gift"></i>
+                <span>{{ items|length }} cadeaux</span>
+            </div>
+            
+            
         </div>
     </div>
     
-    <!-- Liste des articles -->
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h2 class="h4 mb-0">Articles ({{ wishlist.items|length }})</h2>
-            {% if is_granted('EDIT', wishlist) %}
-                <a href="{{ path('app_home', {'wishlist_id': wishlist.id}) }}" class="btn btn-sm btn-primary">
-                    <i class="fas fa-plus me-1"></i> Nouvel article
-                </a>
-            {% endif %}
-        </div>
+    <div class="share-options">
+        <button class="share-btn share-facebook">
+            <i class="fab fa-facebook-f"></i>
+            <span>Facebook</span>
+        </button>
         
-        <div class="card-body">
-            {% if wishlist.items|length > 0 %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Article</th>
-                                <th>Prix</th>
-                                <th>Statut</th>
-                                {% if not is_granted('EDIT', wishlist) %}
-                                    <th>Actions</th>
+        <button class="share-btn share-twitter">
+            <i class="fab fa-twitter"></i>
+            <span>Twitter</span>
+        </button>
+        
+        <button class="share-btn share-whatsapp">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp</span>
+        </button>
+        
+        <button class="share-btn share-email">
+            <i class="fas fa-envelope"></i>
+            <span>Email</span>
+        </button>
+        
+        <button class="share-btn share-link" id="copy-link-btn">
+            <i class="fas fa-link"></i>
+            <span>Copier le lien</span>
+        </button>
+    </div>
+    
+    <div class="items-grid">
+        {% if items|length > 0 %}
+            {% for item in items %}
+                <div class="item-card">
+                    <div class="item-image-container">
+                                
+                        {% if item.price %}
+                            <div class="item-price">{{ item.price|number_format(2, ',', ' ') }} €</div>
+                        {% endif %}
+                        
+                        <div class="item-status {% if item.isPurchased|default(false) %}status-purchased{% else %}status-available{% endif %}">
+                            {% if item.isPurchased|default(false) %}
+                                Réservé
+                            {% else %}
+                                Disponible
+                            {% endif %}
+                        </div>
+                        
+                        {% if item.isPurchased|default(false) %}
+                            <div class="purchased-overlay">
+                                <div class="purchased-text">Déjà réservé</div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="item-content">
+                        <h3 class="item-name">{{ item.name }}</h3>
+                        <p class="item-description">{{ item.description|default('Aucune description disponible') }}</p>
+                        
+                        <div class="item-priority priority-{{ item.priority|default('medium')|lower }}">
+                            <span class="priority-label">Priorité:</span>
+                            <div class="priority-indicator">
+                                <div class="priority-bar"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="item-action">
+                           
+                            {% if item.url %}
+                                <a href="{{ item.url }}" target="_blank" class="view-btn">
+                                    <i class="fas fa-shopping-cart"></i> Voir en boutique
+                                </a>
                                 {% else %}
-                                    <th>Actions</th>
-                                {% endif %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in wishlist.items %}
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            {% if item.hasPurchased and not is_granted('EDIT', wishlist) %}
-                                                <del class="text-muted">{{ item.name }}</del>
-                                            {% else %}
-                                                <strong>{{ item.name }}</strong>
-                                            {% endif %}
-                                            
-                                            {% if item.description %}
-                                                <button type="button" class="btn btn-sm btn-link ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ item.description }}">
-                                                    <i class="fas fa-info-circle"></i>
-                                                </button>
-                                            {% endif %}
-                                        </div>
-                                        {% if item.url %}
-                                            <a href="{{ item.url }}" target="_blank" class="small text-decoration-none">
-                                                <i class="fas fa-external-link-alt me-1"></i>Voir le lien
-                                            </a>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ item.price|number_format(2, ',', ' ') }} €</td>
-                                    <td>
-                                        {% if item.hasPurchased %}
-                                            <span class="badge bg-success">Réservé</span>
-                                            {% if item.proof %}
-                                                <span class="badge bg-info ms-1">Acheté</span>
-                                            {% endif %}
-                                        {% else %}
-                                            <span class="badge bg-light text-dark">Disponible</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if is_granted('EDIT', wishlist) %}
-                                            <div class="btn-group btn-group-sm">
-                                                <a href="{{ path('app_home', {'id': item.id}) }}" class="btn btn-outline-primary">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form method="post" action="{{ path('app_home', {'id': item.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article?');">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
-                                                    <button type="submit" class="btn btn-outline-danger">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        {% else %}
-                                            {% if not item.hasPurchased %}
-                                                <a href="{{ path('app_home', {'id': item.id}) }}" class="btn btn-sm btn-success">
-                                                    <i class="fas fa-gift me-1"></i> Réserver
-                                                </a>
-                                            {% elseif item.hasPurchased and item.proof and item.proof.buyer == app.user %}
-                                                <a href="{{ path('app_home', {'id': item.proof.id}) }}" class="btn btn-sm btn-info">
-                                                    <i class="fas fa-edit me-1"></i> Modifier preuve
-                                                </a>
-                                            {% elseif item.hasPurchased and not item.proof and app.user %}
-                                                <a href="{{ path('app_home', {'item_id': item.id}) }}" class="btn btn-sm btn-outline-info">
-                                                    <i class="fas fa-check-circle me-1"></i> Confirmer achat
-                                                </a>
-                                            {% endif %}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                <p class="view-btn" > Aucun URL n'est fournie!</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            {% else %}
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i> Cette liste ne contient aucun article pour le moment.
-                    {% if is_granted('EDIT', wishlist) %}
-                        <a href="{{ path('app_home') }}" class="alert-link">Ajouter votre premier article</a>.
-                    {% endif %}
-                </div>
-            {% endif %}
-        </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-wishlist">
+                <h2 class="empty-title">Cette liste de souhaits est vide</h2>
+                <p>Il n'y a actuellement aucun cadeau dans cette liste.</p>
+                <a href="{{ path('app_home') }}" class="return-home">
+                    <i class="fas fa-home"></i> Retour à l'accueil
+                </a>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -186,10 +477,90 @@
 {{ parent() }}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialisation des tooltips Bootstrap
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
+        // Gestion du bouton de copie de lien
+        const copyLinkBtn = document.getElementById('copy-link-btn');
+        if (copyLinkBtn) {
+            copyLinkBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Créer un input temporaire pour copier le lien actuel
+                const tempInput = document.createElement('input');
+                tempInput.value = window.location.href;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                
+                // Changer le texte du bouton temporairement
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> <span>Lien copié!</span>';
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+        
+        // Gestion des boutons de réservation
+        const reserveButtons = document.querySelectorAll('.reserve-item-btn');
+        reserveButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-item-id');
+                const itemCard = this.closest('.item-card');
+                const statusBadge = itemCard.querySelector('.item-status');
+                
+                // Demander confirmation
+                if (confirm('Êtes-vous sûr de vouloir réserver ce cadeau? Les autres visiteurs sauront qu\'il est déjà pris.')) {
+                    // Simuler une requête AJAX pour mettre à jour le statut
+                    // Dans un cas réel, vous enverriez une requête à votre serveur
+                    
+                    // Ajouter l'overlay "Déjà réservé"
+                    const imageContainer = itemCard.querySelector('.item-image-container');
+                    const overlay = document.createElement('div');
+                    overlay.className = 'purchased-overlay';
+                    overlay.innerHTML = '<div class="purchased-text">Déjà réservé</div>';
+                    imageContainer.appendChild(overlay);
+                    
+                    // Mettre à jour le statut
+                    statusBadge.textContent = 'Réservé';
+                    statusBadge.classList.remove('status-available');
+                    statusBadge.classList.add('status-purchased');
+                    
+                    // Mettre à jour le bouton
+                    this.innerHTML = '<i class="fas fa-lock"></i> Déjà réservé';
+                    this.classList.add('disabled');
+                    this.disabled = true;
+                    
+                    // Afficher un message de confirmation
+                    alert('Merci! Ce cadeau a été marqué comme réservé. N\'oubliez pas de l\'acheter pour faire plaisir à ' + 
+                          '{{ wishlist.owner.firstName|default(wishlist.owner.username) }}!');
+                }
+            });
+        });
+        
+        // Gestion des boutons de partage sur les réseaux sociaux
+        const shareButtons = document.querySelectorAll('.share-facebook, .share-twitter, .share-whatsapp, .share-email');
+        shareButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent('{{ wishlist.name }} - Liste de souhaits');
+                
+                let shareUrl = '';
+                
+                if (this.classList.contains('share-facebook')) {
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                } else if (this.classList.contains('share-twitter')) {
+                    shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+                } else if (this.classList.contains('share-whatsapp')) {
+                    shareUrl = `https://wa.me/?text=${title}%20${url}`;
+                } else if (this.classList.contains('share-email')) {
+                    shareUrl = `mailto:?subject=${title}&body=Découvre cette liste de souhaits: ${url}`;
+                }
+                
+                if (shareUrl) {
+                    window.open(shareUrl, '_blank');
+                }
+            });
         });
     });
 </script>
