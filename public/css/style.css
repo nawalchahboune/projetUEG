@@ -10,11 +10,6 @@
     --danger-color: #a12d25;
 }
 
-body {
-    background-color: var(--light-color);
-    color: var(--dark-color);
-}
-
 /* Override Bootstrap colors */
 .btn-primary {
     background-color: var(--primary-color);
@@ -37,10 +32,15 @@ body {
 
 /* Search container styling */
 .search-container {
-    background-color: white;
+    background-color: var(--light-color);
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-search{
+    background-color: var(--success-color);
+    color: var(--light-color);
 }
 
 /* Card styling */
@@ -82,4 +82,29 @@ footer {
 .btn-primary, .btn-primary:hover {
     background-color: var(--light-color);
     color: var(--dark-color);
+}
+
+/* Footer styling */
+html {
+    height: 100%;
+}
+
+body {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+.content-wrapper {
+    flex: 1 0 auto;
+}
+
+.footer {
+    background-color: var(--dark-color);
+    color: var(--light-color);
+    margin-top: auto;
+    flex-shrink: 0;
 }

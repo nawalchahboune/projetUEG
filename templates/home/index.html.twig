@@ -17,8 +17,8 @@
                 <div class="search-container mb-5">
                     <form action="{{ path('app_gift_search') }}" method="GET" class="d-flex">
                         <input type="text" name="q" class="form-control form-control-lg" placeholder="Search for gifts..." aria-label="Search">
-                        <button class="btn btn-primary btn-lg ms-2" type="submit">
-                            <i class="fas fa-search"></i> Search
+                        <button class="btn btn-search btn-lg ms-2" type="submit">
+                            <i class="fas fa-search"></i> 
                         </button>
                     </form>
                 </div>
@@ -28,7 +28,7 @@
         <div class="row mt-4">
             <div class="col-md-4">
                 <div class="card mb-4">
-                    <div class="card-body text-center">
+                    <div class="btn card-body text-center" href="{{ path('app_wishlists_create') }}">
                         <i class="fas fa-gift fa-3x mb-3 text-primary"></i>
                         <h3>Create Wishlists</h3>
                         <p>Create your personal wishlist and share it with friends and family.</p>

@@ -22,6 +22,8 @@
         {% endblock %}
     </head>
     <body>
+        <div class="content-wrapper">
+
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
             <div class="container">
             <a class="navbar-brand brand-logo" href="{{ path('app_home') }}">GiftWish</a>
@@ -95,11 +97,10 @@
             
             {% block body %}{% endblock %}
         </div>
-        
-        <footer class="mt-5 py-3 bg-dark text-white">
-            <div class="container text-center">
-                <p>Gift Exchange © {{ "now"|date("Y") }}</p>
-            </div>
-        </footer>
+    </div>
+
+    <footer class="py-3 footer text-center">
+        <p>Gift Exchange © {{ "now"|date("Y") }}</p>
+    </footer>
     </body>
 </html>
