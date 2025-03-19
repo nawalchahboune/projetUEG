@@ -1,5 +1,5 @@
 {# filepath: templates/admin/top3.html.twig #}
-{% extends 'admin/dashboard.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Top 3 Statistics - GiftWish Admin{% endblock %}
 
@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 {% endblock %}
 
-{% block admin_body %}
+{% block body %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="display-6">Top 3 Statistics</h1>

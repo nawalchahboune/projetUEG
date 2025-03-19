@@ -32,7 +32,6 @@ class Invitation
         $this->sender = $sender;
         $this->receivers = $receivers;
         $this->accepted = false;
-
     }
 
     public function getId(): ?int
