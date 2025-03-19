@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 enum NotificationType: string {
@@ -36,6 +35,8 @@ class Notification
     #[ORM\OneToOne(inversedBy: 'myNotifications', targetEntity: User::class, orphanRemoval: true)]
     private ?User $recipient;
     private NotificationType $type;
+    private ?Invitation $invitation;
+    private ?Item $item;
     private string $message;
 
     public function __construct(?User $sender, ?User $recipient, NotificationType $type)
@@ -51,26 +52,26 @@ class Notification
         $this->type->handleNotification($this);
     }
 
-    public function sendAnswerInvitationNotif(?Invitation $invitation): void
+    public function sendAnswerInvitationNotif(): void
     {
-        if($invitation->$accepted == true)
+        if($this->invitation->isAccepted() == true)
         {
-            $this->message = $this->$sender->$username ."a accépté votre invitation";
+            $this->message = $this->sender->getUsername() ."a accépté votre invitation";
         }
         else
         {
-            $this->message = $this->$sender->$username ."a refusé votre invitation";
+            $this->message = $this->sender->getUsername() ."a refusé votre invitation";
         }
     }
 
-    public function sendPurchaseNotif(?Item $item): void
+    public function sendPurchaseNotif(): void
     {
-        $this->message = $this->$sender->$username ." vous a acheté l'article " . $item->$name;
+        $this->message = $this->sender->getUsername() ." vous a acheté l'article " . $this->item->getName();
     }
 
-    public function sendProofNotif(?Item $item): void
+    public function sendProofNotif(): void
     {
-        $this->message ="Votre preuve a été validé pour l'item " . $item->$name;
+        $this->message ="Votre preuve a été validé pour l'item " . $this->item->getName();
     }
     
     public function getSender(): ?User

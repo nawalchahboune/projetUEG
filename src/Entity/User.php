@@ -3,16 +3,22 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Interfaces\myInvitationPage;
+use App\Interfaces\myWishlistListPage;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use myInvitationPage as GlobalMyInvitationPage;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\Item;
+use App\Entity\Wishlist;
+use myWishlistListPage as GlobalMyWishlistListPage;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, myInvitationPage, myWishlist
+class User implements UserInterface, PasswordAuthenticatedUserInterface, GlobalMyInvitationPage, GlobalMyWishlistListPage
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -242,4 +248,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, myInvit
     {
         return $this->email;
     }
+
+    // MyInvitationPage interface methods
+    public function acceptInvitation(?Invitation $invitation): void
+    {
+        $invitation->setAccepted(true);
+    }
+    // MyWishlistListPage interface methods
+    public function createWishlist(string $title, ?\DateTimeInterface $deadline): ?Wishlist
+    {
+        $wishlist = new Wishlist();
+        $wishlist->setName($title);
+        $wishlist->setDeadline($deadline);
+        $wishlist->setOwner($this);
+        $this->addOwnedWishlist($wishlist);
+        return $wishlist;
+    }
+
+    public function deleteWishlist(?Wishlist $wishlist): void
+    {
+        $this->removeOwnedWishlist($wishlist);
+        
+    }
+
+    public function shareWishlist(?Wishlist $wishlist, Collection $users): void
+    {
+        foreach ($users as $user) {
+            $wishlist->addCollaborator($user);
+        }
+    }
+
+    public function displayWishlist(?Wishlist $wishlist, Collection $users): void
+    {
+        // A IMPLEMENTER !
+    }
+
+
 }

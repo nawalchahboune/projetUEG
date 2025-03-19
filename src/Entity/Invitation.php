@@ -2,10 +2,10 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Repository\InvitationRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InvitationRepository::class)]
 #[ORM\Table(name: '`invitation`')]
@@ -23,7 +23,7 @@ class Invitation
     #[ORM\OneToMany(inversedBy: 'myInvitations', targetEntity: User::class, orphanRemoval: true)]
     private Collection $receivers;
 
-    private ?boolval $accepted = null;
+    private ?bool $accepted = null;
 
     public function __construct(?Wishlist $wishlist, ?User $sender, Collection $receivers)
     {
