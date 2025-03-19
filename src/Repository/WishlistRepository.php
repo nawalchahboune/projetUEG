@@ -40,4 +40,16 @@ class WishlistRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findTop3WishlistsByTotalValue(): array
+    {
+        return $this->createQueryBuilder('w')
+            ->select('w', 'SUM(i.price) as totalValue')
+            ->join('w.items', 'i')
+            ->groupBy('w')
+            ->orderBy('totalValue', 'DESC')
+            ->setMaxResults(3)
+            ->getQuery()
+            ->getResult();
+    }
 }

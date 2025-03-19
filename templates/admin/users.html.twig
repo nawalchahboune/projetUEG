@@ -1,0 +1,77 @@
+{# templates/admin/users.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management - GiftWish{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-6">Users list</h1>
+        
+        {# Optional search bar #}
+        <form action="{{ path('admin_users') }}" method="get" class="d-flex">
+            <input type="text" name="q" placeholder="Search user" class="form-control me-2">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+
+    {# Example of a success/error message block #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+        {% for user in users %}
+            <div class="col">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title mb-0">{{ user.username }}</h5>
+                            {# Example of locked or active badge #}
+                            {% if user.lockStatus %}
+                                <span class="badge bg-danger">Locked</span>
+                            {% else %}
+                                <span class="badge bg-success">Active</span>
+                            {% endif %}
+                        </div>
+                        <p class="card-text text-muted">
+                            Member since: 01/01/2001
+                            <br>
+                            Email: {{ user.email }}
+                        </p>
+                        
+                        <div class="mt-2">
+                            {% if user.lockStatus %}
+                                <form action="{{ path('admin_user_unlock', {'id': user.id}) }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success">Unlock</button>
+                                </form>
+                            {% else %}
+                                <form action="{{ path('admin_user_lock', {'id': user.id}) }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-warning">Lock</button>
+                                </form>
+                            {% endif %}
+                            
+                            <form action="{{ path('admin_user_delete', {'id': user.id}) }}" method="post" class="d-inline" 
+                                  onsubmit="return confirm('Are you sure you want to remove this user?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">No users found.</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
