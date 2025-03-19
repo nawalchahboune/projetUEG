@@ -2,23 +2,25 @@
 
 namespace App\Entity;
 
+use App\Interfaces\MyWishlistsListPage;
 use App\Repository\UserRepository;
-use App\Interfaces\myInvitationPage;
-use App\Interfaces\myWishlistListPage;
+use App\Interfaces\MyInvitationPage;
+use App\Interfaces\MyWishlistListPage;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use myInvitationPage as GlobalMyInvitationPage;
+use MyInvitationPage as GlobalMyInvitationPage;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Item;
 use App\Entity\Wishlist;
+use App\Interfaces\MyWishlistPage;
 use myWishlistListPage as GlobalMyWishlistListPage;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface, GlobalMyInvitationPage, GlobalMyWishlistListPage
+class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvitationPage, MyWishlistsListPage
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -264,7 +266,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, GlobalM
     // MyWishlistListPage interface methods
     public function createWishlist(string $title, ?\DateTimeInterface $deadline): ?Wishlist
     {
-        $wishlist = new Wishlist();
+        $wishlist = new Wishlist($title, $deadline);
         $wishlist->setName($title);
         $wishlist->setDeadline($deadline);
         $wishlist->setOwner($this);
