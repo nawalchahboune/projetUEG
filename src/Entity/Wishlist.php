@@ -8,13 +8,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use myWishlistPage;
+use MyWishlistPage;
 use Symfony\Component\Validator\Constraints as Assert;
-use viewUserWishlist;
+use ViewUserWishlist;
 use App\Entity\Item;
 
 #[ORM\Entity(repositoryClass: WishlistRepository::class)]
-class Wishlist implements viewUserWishlist, myWishlistPage
+class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWishlistPage
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,7 +38,7 @@ class Wishlist implements viewUserWishlist, myWishlistPage
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'collaborativeWishlists')]
     private Collection $collaborators;
 
-    public function __construct(?string $name, ?DateTimeInterface $deadline )
+    public function __construct(?string $name=null, ?DateTimeInterface $deadline=null )
     {
         $this->name = $name;
         $this->deadline = $deadline;

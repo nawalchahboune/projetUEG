@@ -1,6 +1,8 @@
 <?php
+namespace App\Interfaces;
 
-interface viewUserWishlist
+
+interface ViewUserWishlist
 {
     public function sortItemsAsc(): void;
     public function sortItemsDesc(): void;

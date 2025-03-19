@@ -1,6 +1,8 @@
 <?php
+namespace App\Interfaces;
 
-interface purchasePage
+
+interface PurchasePage
 {
     public function addProof() : Bool;
     public function sendMessage(String $message) : void;
