@@ -40,4 +40,13 @@ class ItemRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findTop3MostExpensiveItems(): array
+    {
+        return $this->createQueryBuilder('i')
+            ->orderBy('i.price', 'DESC')
+            ->setMaxResults(3)
+            ->getQuery()
+            ->getResult();
+    }
 }
