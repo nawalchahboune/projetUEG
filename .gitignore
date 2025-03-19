@@ -8,4 +8,5 @@
 /var/
 /vendor/
 /.env
+/compose.yaml
 ###< symfony/framework-bundle ###
