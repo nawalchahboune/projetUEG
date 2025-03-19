@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
+use App\FormRegister\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,8 +12,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\String\Slugger\SluggerInterface;
-
-
 class SecurityController extends AbstractController
 {
     #[Route('/signup', name: 'app_signup',)]
@@ -31,6 +29,7 @@ class SecurityController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Handle profile photo upload
+            /*
             $profilePhotoFile = $form->get('profilePhoto')->getData();
             if ($profilePhotoFile) {
                 $originalFilename = pathinfo($profilePhotoFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -46,14 +45,19 @@ class SecurityController extends AbstractController
                 } catch (\Exception $e) {
                     // Handle exception if file upload fails
                 }
-            }
+            }*/
             // Encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
                     $form['plainPassword']['first']->getData())
             );
-
+            $user->setEmail($form['email']->getData());
+            $user->setLockStatus(false);
+            $user->setType('user');
+            $user->setUsername($form['username']->getData());
+            $user->setFirstName($form['firstName']->getData());
+            $user->setLastName($form['lastName']->getData());
             $entityManager->persist($user);
             $entityManager->flush();
 
@@ -82,11 +86,11 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/disconnect', name: 'app_logout')]
+    #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
     // This method can be empty - it will be intercepted by the logout key on your firewall
     // The actual logout logic is handled by Symfony's security system
-    throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    throw new \LogicException(message: 'This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 }
