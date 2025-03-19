@@ -18,7 +18,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[IsGranted('ROLE_USER')]
 class WishlistsController extends AbstractController
 {
-    #[Route('/', name: 'app_home')]
+    #[Route('/', name: 'app_wishlists_index')]
     public function index(WishlistRepository $wishlistRepository): Response
     {
         // Récupérer l'utilisateur connecté
@@ -53,7 +53,7 @@ class WishlistsController extends AbstractController
             $entityManager->persist($wishlist);
             $entityManager->flush();
             
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_wishlists_index');
         }
         
         return $this->render('wishlists/create.html.twig', [
@@ -75,7 +75,7 @@ class WishlistsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
             
-            return $this->redirectToRoute('app_home');
+            return $this->redirectToRoute('app_wishlists_index');
         }
         
         return $this->render('wishlists/edit.html.twig', [
@@ -97,7 +97,7 @@ class WishlistsController extends AbstractController
             $entityManager->flush();
                     }
         
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_wishlists_index');
     }
 
     #[Route('/{id}/getUrl', name: 'app_wishlists_get_url')]
