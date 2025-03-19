@@ -57,11 +57,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'receivers', targetEntity: Invitation::class, orphanRemoval: true)]
     private Collection $myInvitations;
 
+    #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: Notification::class, orphanRemoval: true)]
+    private Collection $myNotifications;
+
+
 
     public function __construct()
     {
         $this->ownedWishlists = new ArrayCollection();
         $this->collaborativeWishlists = new ArrayCollection();
+        $this->myInvitations = new ArrayCollection();
     }
 
     public function getId(): ?int
