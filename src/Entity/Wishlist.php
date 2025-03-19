@@ -8,10 +8,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use myWishlistPage;
 use Symfony\Component\Validator\Constraints as Assert;
+use viewUserWishlist;
+use App\Entity\Item;
 
 #[ORM\Entity(repositoryClass: WishlistRepository::class)]
-class Wishlist
+class Wishlist implements viewUserWishlist, myWishlistPage
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -78,17 +81,15 @@ class Wishlist
         return $this->items;
     }
 
-    public function addItem(Item $item): self
+    public function addItem(?Item $item): void
     {
         if (!$this->items->contains($item)) {
             $this->items->add($item);
             $item->setWishlist($this);
         }
-
-        return $this;
     }
 
-    public function removeItem(Item $item): self
+    public function removeItem(?Item $item): void
     {
         if ($this->items->removeElement($item)) {
             // set the owning side to null (unless already changed)
@@ -96,8 +97,13 @@ class Wishlist
                 $item->setWishlist(null);
             }
         }
-
-        return $this;
+    }
+    public function editItem(?Item $item, string $newName, string $newDescription, int $newPrice, string $newUrl): void
+    {
+        $item->setName($newName);
+        $item->setDescription($newDescription);
+        $item->setPrice($newPrice);
+        $item->setUrl($newUrl);
     }
 
     public function getOwner(): ?User
@@ -143,5 +149,26 @@ class Wishlist
     public function delete(): void
     {
         // Cette méthode sera implémentée dans le service ou le contrôleur
+    }
+
+    public function sortItemsAsc(): void
+    {
+        $iterator = $this->items->getIterator();
+        $itemsArray = $this->items->toArray();
+        usort($itemsArray, function (Item $a, Item $b) {
+            return ($a->getName() <=> $b->getName());
+        });
+        $this->items = new ArrayCollection($itemsArray);
+    }
+
+    public function sortItemsDesc(): void
+    {
+        $iterator = $this->items->getIterator();
+        $itemsArray = $this->items->toArray();
+        usort($itemsArray, function (Item $a, Item $b) {
+            return ($b->getName() <=> $a->getName());
+        });
+        $this->items = new ArrayCollection($itemsArray);
+        $this->items = new ArrayCollection(iterator_to_array($iterator));
     }
 }

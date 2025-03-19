@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add New Item{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .form-title {
+        font-size: 1.8rem;
+        color: #0f1d36;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border: none;
+        font-size: 1rem;
+    }
+    
+    .btn-primary {
+        background-color: #0f1d36;
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background-color: #1a2e4c;
+    }
+    
+    .btn-secondary {
+        background-color: #e5e5e5;
+        color: #333;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #d5d5d5;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="form-container">
+    <h1 class="form-title">Add New Item to {{ wishlist.name }}</h1>
+    
+    {{ form_start(form, {'attr': {'class': 'item-form'}}) }}
+        <div class="form-group">
+            {{ form_label(form.name, 'Item Name', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Enter item name'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Describe the item (optional)'}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.price, 'Price (€)', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.price, {'attr': {'class': 'form-control', 'placeholder': 'Enter price (optional)'}}) }}
+            {{ form_errors(form.price) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.url, 'URL', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.url, {'attr': {'class': 'form-control', 'placeholder': 'Enter a link where to buy this item (optional)'}}) }}
+            {{ form_errors(form.url) }}
+        </div>
+        
+        <div class="form-actions">
+            <a href="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': 0}) }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Item</button>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

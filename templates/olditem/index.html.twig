@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ArithmeticTableController!{% endblock %}
+{% block title %}Hello ItemController!{% endblock %}
 
 {% block body %}
 <style>
@@ -13,9 +13,8 @@
 
     This friendly message is coming from:
     <ul>
-     {% for i in 1..10 %}
-            <li><a href="{{ path('multip_table', {'number': i, 'taille': 10}) }}">Table de multiplication {{ i }}</a></li>
-        {% endfor %}
-     </ul>
+        <li>Your controller at <code>C:/wrk/perso/webapp/symfony-docker/symfony-docker/project/src/Controller/ItemController.php</code></li>
+        <li>Your template at <code>C:/wrk/perso/webapp/symfony-docker/symfony-docker/project/templates/item/index.html.twig</code></li>
+    </ul>
 </div>
 {% endblock %}
