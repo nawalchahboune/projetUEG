@@ -20,7 +20,7 @@ class Invitation
 
     private ?User $sender = null;
 
-    #[ORM\OneToMany(inversedBy: 'myInvitations', targetEntity: User::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: User::class, orphanRemoval: true, )]
     private Collection $receivers;
 
     private ?bool $accepted = null;
