@@ -251,3 +251,243 @@ body {
     border-radius: 50%;
     margin-bottom: 10px;
 }
+
+.search-container {
+    max-width: 800px;
+    width: 100%;
+}
+
+.form-control {
+    flex-grow: 1; 
+    border: none;
+    box-shadow: none;
+    background-color: white; 
+    padding: 10px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+.input-group-text {
+    background-color: white;
+    border: none;
+    max-width: 800px;
+    width: 100%;
+}
+
+.search-button {
+    background-color: #00A9E0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+/* Section: How GiftWish Works */
+.giftwish-works {
+    padding: 60px 20px;
+}
+
+.giftwish-works h2 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+/* Conteneur Flexbox pour alignement horizontal */
+.giftwish-works .d-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Aligner en haut pour garder l’harmonie */
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* Boîte de chaque élément */
+.feature-box {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    width: 30%; /* Ajuster pour un bon affichage */
+    text-align: center;
+}
+
+.feature-box:hover {
+    transform: translateY(-5px);
+}
+
+/* Images bien alignées */
+.feature-img {
+    max-width: 100px;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature-box h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.feature-box p {
+    font-size: 14px;
+    color: #555;
+}
+
+/* Adaptabilité pour mobile */
+@media (max-width: 768px) {
+    .giftwish-works .d-flex {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .feature-box {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+/* giftwhish-community section */
+.giftwish-community {
+    padding: 40px 20px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.giftwish-community h2 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.community-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+/* Liste des éléments */
+.community-list {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Chaque élément : image tout à gauche, texte + bouton tout à droite */
+.community-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Image bien calée à gauche */
+.community-img {
+    flex-shrink: 0;
+    width: 180px;
+}
+
+.community-img img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Texte bien calé à droite */
+.community-text {
+    flex: 1;
+    text-align: right;
+    padding-left: 40px;
+}
+
+.community-text h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.community-text p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+/* Boutons */
+.community-text .btn {
+    background-color: #5cb85c;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+/* Suppression du dernier trait */
+.community-item:last-child {
+    border-bottom: none;
+}
+
+/* Responsive : en colonne sur mobile */
+@media (max-width: 768px) {
+    .community-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .community-img {
+        width: 120px;
+    }
+
+    .community-text {
+        text-align: center;
+        padding-left: 0;
+    }
+}
+
+/* get-giftwish */
+.get-giftwish-app {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: auto;
+    padding: 40px 20px;
+    border-bottom: 1px solid #E5E7EB; /* Ligne grise en bas */
+}
+
+/* Titre de la section */
+.get-giftwish-app h2 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+/* Texte */
+.get-giftwish-app p {
+    font-size: 16px;
+    color: #374151; /* Gris foncé */
+    margin-bottom: 20px;
+}
+
+/* Bouton vert */
+.get-giftwish-app .btn-green {
+    background-color: #98C99C; /* Vert pastel */
+    color: #111827;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Image */
+.get-giftwish-app img {
+    width: 250px;
+    max-width: 100%;
+}
