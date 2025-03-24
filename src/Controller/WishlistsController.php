@@ -139,4 +139,6 @@ class WishlistsController extends AbstractController
             'message' => 'Liste de souhaits créée avec succès'
         ]);
     }
+
+    
 }

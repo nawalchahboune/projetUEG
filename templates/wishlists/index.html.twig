@@ -5,12 +5,16 @@
 
 {% block body %}
 <div class="container">
-    <h1>Mes listes de souhaits</h1>
 
-    <div class="mb-4">
-        <a href="{{ path('app_wishlists_create') }}" class="btn btn-primary">Créer une nouvelle liste</a>
+    <div class="row mb-4" style="justify-content: center;">
+        <div class="col-md-4 text-md-center">
+            <h1>Mes listes de souhaits</h1>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ path('app_wishlists_create') }}" class="btn btn-creer">Créer une nouvelle liste</a>
+        </div>
+
     </div>
-
     {% if wishlists is empty %}
         <div class="alert alert-info">Vous n'avez pas encore créé de liste de souhaits.</div>
     {% else %}

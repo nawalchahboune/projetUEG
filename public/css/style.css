@@ -16,6 +16,13 @@
     border-color: var(--primary-color);
 }
 
+.btn-creer {
+    background-color: var(--dark-color);
+    border-color: var(--dark-color);
+    color: var(--light-color);
+    margin: 2px;
+}
+
 .btn-primary:hover {
     background-color: #303f9f;
     border-color: #303f9f;
@@ -41,6 +48,14 @@
 .btn-search{
     background-color: var(--success-color);
     color: var(--light-color);
+}
+
+.title {
+    color: var(--dark-color);
+    font-size: 2rem;
+    justify-content: center;
+    margin: 2rem 0;
+
 }
 
 /* Card styling */
@@ -109,25 +124,44 @@ body {
     flex-shrink: 0;
 }
 
+
+/* SIGN UP */
+
 /* SIGN UP */
 
 .signup-container {
     display: flex;
     min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    margin-top: -4rem; /* Remove the navbar space */
 }
 
 .signup-sidebar {
-    flex: 1;
-    background-color: var(--light-color);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 2rem;
+    flex: 0 0 50%; /* Fixed width at 50% */
+    background-color: var(--dark-color); /* Fallback color */
     position: relative;
+    padding: 0; /* Remove padding */
+    overflow: hidden; /* Ensure the image doesn't overflow */
+}
+
+.signup-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://thumbs.dreamstime.com/b/close-up-hands-giving-beautifully-wrapped-gift-to-another-person-scene-conveys-warmth-care-symbolizes-person-352951009.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
 }
 
 .signup-content {
-    flex: 1;
+    flex: 0 0 50%; /* Fixed width at 50% */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -137,60 +171,18 @@ body {
 
 .signup-form {
     width: 100%;
-    max-width: 320px;
+    max-width: 450px; /* Make the form wider */
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
 }
 
 .form-control {
-    width: 100%;
     padding: 0.75rem 1rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
     font-size: 1rem;
-}
-
-.signup-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
-}
-
-.logo {
-    font-family: 'Pacifico', cursive;
-    font-size: 2.5rem;
-    color: white;
-    margin-bottom: 1rem;
-    position: absolute;
-    top: 2rem;
-    left: 2rem;
-}
-
-.tagline {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: white;
-    margin-bottom: 1rem;
-    line-height: 1.3;
-}
-
-.signin-prompt {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 3rem;
-}
-
-.signin-link {
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    color: var(--primary-color);
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
 }
 
 .backdrop-overlay {
@@ -199,12 +191,93 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
     z-index: 1;
 }
 
 .sidebar-content {
-    position: relative;
+    position: absolute;
     z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    text-align: center;
     color: white;
+}
+
+.logo {
+    font-family: 'Pacifico', cursive;
+    font-size: 4rem;
+    color: white;
+    margin-bottom: 6rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tagline {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.signup-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.signup-btn:hover {
+    background-color: #0095b3;
+}
+
+.signin-prompt {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.signin-link {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.5rem;
+}
+
+.signin-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .signup-container {
+        flex-direction: column;
+    }
+    
+    .signup-sidebar, .signup-content {
+        width: 100%;
+        flex: none;
+    }
+    
+    .signup-sidebar {
+        height: 40vh;
+    }
+    
+    .logo {
+        margin-bottom: 2rem;
+        font-size: 3rem;
+    }
+    
+    .tagline {
+        font-size: 1.5rem;
+    }
 }
