@@ -22,7 +22,7 @@ class Invitation
     private ?User $sender = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'myInvitations')]
-    private ?User $receiver;
+    private Collection $receivers;
 
     private ?bool $accepted = null;
 
@@ -32,8 +32,6 @@ class Invitation
         $this->sender = $sender;
         $this->receivers = $receivers;
         $this->accepted = false;
-
-        return $this;
     }
 
     public function getId(): ?int
