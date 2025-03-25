@@ -45,8 +45,6 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
     #[ORM\Column(length: 36, unique: true, nullable: true, name:'public_token')]
     private ?string $publicToken = null;
 
-    // ...existing relationships and methods
-
     public function getCollaborationToken(): ?string
     {
         if ($this->collaborationToken === null) {
