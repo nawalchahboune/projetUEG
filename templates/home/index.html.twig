@@ -1,164 +1,124 @@
-{% extends 'base.html.twig' %}
+{# templates/home.html.twig #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GiftWish - Home</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap">
 
-{% block title %}GiftWish - Home{% endblock %}
+  <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+</head>
+<body>
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <style> 
-</style>
-{% endblock %}
 
-{% block body %}
-    <div class="container">
-        <div class="row justify-content-center mt-5">
-         <div class="row justify-content-center mt-5">
-        <div class="col-md-8 text-center d-flex align-items-center justify-content-center">
-            <img src="/images/kdo.png" alt="Gift Icon" style="height: 80px; width: auto; margin-right: 15px;">
-            <h2 class="display-4 mb-4">
-                <span>Discover the perfect gift from a wishlist</span>
-            </h2>
-        </div>
-
-        <div class="col-md-8 d-flex align-items-center justify-content-center">
-            <!-- Barre de recherche -->
-            <div class="search-container mb-5">
-                <form action="{{ path('app_gift_search') }}" method="GET" class="d-flex">
-                    <div class="input-group">
-                        <span class="input-group-text"><input type="text" name="q"  class="form-control"  
-                            placeholder="Search for gifts..." ><i class="fas fa-search"></i></span>
-                    </div>
-                    <button class="btn btn-lg ms-2 search-button" type="submit">Search</button>
-                </form>
-            </div>
-            {# <img src="/images/community.png" alt="People gifting" class="img-fluid ms-3" style="height: 130px;"> #}
-
-        </div> 
-
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo">GiftWish</div>
     </div>
-
-        <!--
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="btn card-body text-center" href="{{ path('app_wishlists_create') }}">
-                        <i class="fas fa-gift fa-3x mb-3 text-primary"></i>
-                        <h3>Create Wishlists</h3>
-                        <p>Create your personal wishlist and share it with friends and family.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-body text-center">
-                        <i class="fas fa-search fa-3x mb-3 text-primary"></i>
-                        <h3>Discover Gifts</h3>
-                        <p>Explore gift ideas and find inspiration for special occasions.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-body text-center">
-                        <i class="fas fa-users fa-3x mb-3 text-primary"></i>
-                        <h3>Connect</h3>
-                        <p>Join events and connect with friends to exchange gifts.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% if not is_granted('ROLE_USER') %}
-        <div class="row mt-4">
-            <div class="col-12 text-center">
-                <p class="lead">Get started today:</p>
-                <a href="{{ path('app_login') }}" class="btn btn-primary btn-lg mx-2">Log In</a>
-                <a href="{{ path('app_signup') }}" class="btn btn-outline-primary btn-lg mx-2">Sign Up</a>
-            </div>
-        </div>
-        {% endif %}
+    <div class="nav-right">
+      <a href="{{ path('app_login') }}">Log In</a>
+      <a href="{{ path('app_signup') }}" class="btn-signup">Sign Up</a>
     </div>
-    -->
+  </nav>
 
 
-<!-- Section: How GiftWish Works -->
-<section class="giftwish-works container">
-    <h2 class="text-center">How GiftWish works</h2>
-    <div class="d-flex justify-content-between align-items-start text-center flex-wrap">
-        <div class="feature-box">
-            <img src="{{ asset('images/expensive-gifts.jpg') }}" alt="Top expensive gifts" class="feature-img">
-            <h3>Top expensive gifts</h3>
-            <p>Enter a wishlist. Find the most wanted gifts or add new ones.</p>
-        </div>
-        <div class="feature-box">
-            <img src="{{ asset('images/wishlist.jpg') }}" alt="Top wishlists" class="feature-img">
-            <h3>Top wishlists by</h3>
-            <p>View top items and wishlists. Explore profiles and receive updates.</p>
-        </div>
-        <div class="feature-box">
-            <img src="{{ asset('images/purchased-items.jpg') }}" alt="Top purchased items" class="feature-img">
-            <h3>Top purchased items</h3>
-            <p>Complete your purchase. Sit back and wait for the joy of giving!</p>
-        </div>
+<section class="hero">
+  <!-- Left: Gift Image -->
+  <div class="hero-left">
+    <img src="{{ asset('assets/image (1).png') }}" alt="GiftWish Box" class="hero-img">
+  </div>
+
+  <div class="hero-right">
+    <h1>
+      Discover the perfect gift <br>
+      from a wishlist
+    </h1>
+    <div class="search-bar">
+      <form action="{{ path('app_gift_search') }}" method="GET">
+        <input type="text" name="q" placeholder="Search for gifts...">
+        <button type="submit">Search</button>
+      </form>
     </div>
+  </div>
 </section>
 
-<hr>
 
-<section class="giftwish-community container">
-    <h2 class="community-title">Join GiftWish community</h2>
 
-    <div class="community-list">
-        <!-- Gift Giver -->
-        <div class="community-item">
-            <div class="community-img">
-                <img src="{{ asset('images/gift-giver.jpg') }}" alt="Gift giver">
-            </div>
-            <div class="community-text">
-                <h3>As a gift giver</h3>
-                <p>Surprise loved ones with wishlist items. Make dreams come true.</p>
-                <a href="{{ path('app_about') }}" class="btn btn-success">Gift now</a>
-            </div>
-        </div>
 
-        <!-- Contributor -->
-        <div class="community-item">
-            <div class="community-img">
-                <img src="{{ asset('images/contributor.jpg') }}" alt="Contributor">
-            </div>
-            <div class="community-text">
-                <h3>As a contributor</h3>
-                <p>Help fulfill wishes with gift contributions and support the community.</p>
-                <a href="{{ path('app_about') }}" class="btn btn-success">Contribute now</a>
-            </div>
-        </div>
 
-        <!-- Team Member -->
-        <div class="community-item">
-            <div class="community-img">
-                <img src="{{ asset('images/team-member.jpg') }}" alt="Team member">
-            </div>
-            <div class="community-text">
-                <h3>As a team member</h3>
-                <p>Join a team that's dedicated to making wishes a reality.</p>
-                <a href="{{ path('app_about') }}" class="btn btn-success">Join us</a>
-            </div>
-        </div>
+  <section class="how-it-works">
+    <h2>How GiftWish works</h2>
+    <div class="features">
+      <div class="feature">
+        <img src="{{ asset('assets/image (2).png') }}" alt="Top expensive gifts">
+        <h3>Top expensive gifts</h3>
+        <p>Enter a wishlist. Find the most exclusive gifts for special occasions.</p>
+      </div>
+      <div class="feature">
+        <img src="{{ asset('assets/image (3).png') }}" alt="Top wishlists">
+        <h3>Top wishlists</h3>
+        <p>View top items and wishlists. Explore profiles and receive updates.</p>
+      </div>
+      <div class="feature">
+        <img src="{{ asset('assets/image (4).png') }}" alt="Top purchased items">
+        <h3>Top purchased items</h3>
+        <p>Complete your purchase. See best sellers for every event.</p>
+      </div>
     </div>
-</section>
+  </section>
 
-<hr>
 
-<section class="get-giftwish-app">
-    <div class="text-content">
-        <h2>Get the GiftWhish App</h2>
+  <section class="community">
+    <h2>Join GiftWish community</h2>
+    <div class="community-cards">
+      <div class="community-card">
+        <img src="{{ asset('assets/image (5).png') }}" alt="As a gift giver">
+        <h3>As a gift giver</h3>
+        <p>Surprise loved ones with wishlist items. Make dreams come true.</p>
+        <a href="#" class="btn">Gift now</a>
+      </div>
+      <div class="community-card">
+        <img src="{{ asset('assets/image (6).png') }}" alt="As a contributor">
+        <h3>As a contributor</h3>
+        <p>Help fulfill wishes with gift contributions and support the community.</p>
+        <a href="#" class="btn">Contribute now</a>
+      </div>
+      <div class="community-card">
+        <img src="{{ asset('assets/image (7).png') }}" alt="As a team member">
+        <h3>As a team member</h3>
+        <p>Join a team that's dedicated to making wishes a reality.</p>
+        <a href="#" class="btn">Join us</a>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="get-app">
+    <h2>Get the GiftWish app</h2>
+    <div class="app-wrapper">
+      <img src="{{ asset('assets/image (8).png') }}" alt="GiftWish app" class="app-img">
+      <div class="app-details">
         <h3>Shop effortlessly!</h3>
         <p>Surprise your loved ones with gifts from their wishlist. Explore a wide range of options from top brands.</p>
-        <button class="btn-green">Get app</button>
+        <a href="#" class="btn">Get app</a>
+      </div>
     </div>
-    <img src="{{ asset('images/gift-image.png') }}" alt="Gift box">
-</section>
+  </section>
 
 
-    
-{% endblock %}
+  {% if not is_granted('ROLE_USER') %}
+    <section class="cta">
+      <p>Get started today:</p>
+      <a href="{{ path('app_login') }}" class="btn">Log In</a>
+      <a href="{{ path('app_signup') }}" class="btn btn-outline">Sign Up</a>
+    </section>
+  {% endif %}
+
+
+  <footer class="footer">
+    <p>Gift • Social Media • Connect • Community</p>
+    <p>&copy; 2025 GiftWish</p>
+  </footer>
+
+</body>
+</html>
