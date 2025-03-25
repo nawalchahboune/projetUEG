@@ -1,7 +1,9 @@
 <?php
 namespace App\Interfaces;
 
-use App\Entity\Item; // Adjust the namespace according to your project structure
+namespace App\Interfaces;
+
+use App\Entity\Item;
 
 interface MyWishlistPage
 {

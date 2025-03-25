@@ -1,0 +1,94 @@
+{# templates/home/about.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %} À Propos {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+{% endblock %}
+
+
+{% block body %}
+    <section class="about-container">
+        <div class="content">
+            <h1>À Propos de Notre Application</h1>
+            <p>
+                Bienvenue sur <strong>WishlistApp</strong>, la solution ultime pour gérer et partager vos listes de souhaits. 
+                Que ce soit pour les anniversaires, Noël ou toute autre occasion spéciale, nous vous aidons à organiser vos envies 
+                et à les partager facilement avec vos proches.
+            </p>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="content">
+            <h2>Nos Fonctionnalités</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h3>📌 Création de Wishlists</h3>
+                    <p>Ajoutez et personnalisez vos listes de souhaits selon vos besoins.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>🔗 Partage Facile</h3>
+                    <p>Envoyez vos listes à vos amis et votre famille en un clic.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>💡 Suggestions Intelligentes</h3>
+                    <p>Bénéficiez de recommandations basées sur vos préférences.</p>
+                </div>
+                <div class="feature-item">
+                    <h3>📊 Suivi des Achats</h3>
+                    <p>Voyez quels cadeaux ont été achetés et ce qui reste à offrir.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="team">
+        <div class="content">
+            <h2>Rencontrez Notre Équipe</h2>
+            <div class="team-members">
+                <div class="member">
+                    <img src="/images/team1.jpg" alt="jd">
+                    <h3>Jean David</h3>
+                    <p>📌 Chef de projet</p>
+                </div>
+                <div class="member">
+                    <img src="/images/team2.jpg" alt="Nw">
+                    <h3>Nawal</h3>
+                    <p>👨‍💻 Developper </p>
+                </div>
+                <div class="member">
+                    <img src="/images/team2.jpg" alt="Kwn">
+                    <h3>Wydie</h3>
+                    <p>👨‍💻 Developper</p>
+                </div>
+                <div class="member">
+                    <img src="/images/team2.jpg" alt="Hd">
+                    <h3>Houda</h3>
+                    <p>👨‍💻 Developper</p>
+                </div>
+                <div class="member">
+                    <img src="/images/team2.jpg" alt="kl">
+                    <h3>Kahoula</h3>
+                    <p>👨‍💻 Developper</p>
+                </div>
+                <div class="member">
+                    <img src="/images/team2.jpg" alt="En">
+                    <h3>Erwan</h3>
+                    <p>👨‍💻 Developper</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact">
+        <div class="content">
+            <h2>Contactez-Nous</h2>
+            <p>📧 Email : <a href="mailto:support@imt-atlantique.net">support@wishlistapp.com</a></p>
+            <p>📍 Adresse : 655 Avenue du Technopôle, Plouzané</p>
+            <p>📞 Téléphone : +33 1 23 45 67 89</p>
+        </div>
+    </section>
+{% endblock %}

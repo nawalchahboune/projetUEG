@@ -9,7 +9,7 @@
 
 {% block body %}
 <div class="signup-container">
-    <div class="signup-sidebar" style="background-image: url('https://thumbs.dreamstime.com/b/close-up-hands-giving-beautifully-wrapped-gift-to-another-person-scene-conveys-warmth-care-symbolizes-person-352951009.jpg'); background-size: cover; background-position: center;">
+    <div class="signup-sidebar" style="background: url('https://thumbs.dreamstime.com/b/close-up-hands-giving-beautifully-wrapped-gift-to-another-person-scene-conveys-warmth-care-symbolizes-person-352951009.jpg');">
         <div class="backdrop-overlay"></div>
         <div class="sidebar-content">
             <div class="logo">GiftWish</div>
@@ -19,7 +19,7 @@
 
     <div class="signup-content">
         <div class="signup-form">
-            <h1 style="font-size: 2rem; margin-bottom: 2rem; color: var(--primary-color); text-align: center;">Sign up</h1>
+            <h1 class='title'>Sign up</h1>
 
             {% for flash_error in app.flashes('verify_email_error') %}
                 <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
