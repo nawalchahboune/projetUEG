@@ -153,7 +153,7 @@ class WishlistController extends AbstractController
             $this->addFlash('success', 'Votre liste de souhaits a été supprimée');
         }
         
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_wishlist_index');
     }
 
     #[Route('/{wishlistId}/goToOfficialWebsite/{itemId}', name: 'app_wishlist_go_to_official_website')]

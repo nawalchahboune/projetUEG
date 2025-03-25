@@ -4,7 +4,7 @@ services:
   db:
     image: mysql:8.0
     environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-app}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-Gifts}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_PWD-iaw}
       #MYSQL_USER: ${MYSQL_USER:-mysqlAdmin}
       #MYSQL_PASSWORD: ${MYSQL_PASSWORD:-adminPwd}

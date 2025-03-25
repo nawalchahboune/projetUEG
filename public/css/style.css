@@ -10,6 +10,21 @@
     --danger-color: #a12d25;
 }
 
+/* Button icon styling */
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.btn-icon:hover {
+    background-color: var(--light-color);
+}
+
 /* Override Bootstrap colors */
 .btn-primary {
     background-color: var(--primary-color);
@@ -36,6 +51,17 @@
     background-color: var(--warning-color);
     border-color: var(--warning-color);
     margin: 2px;
+}
+
+.back-to-lists-btn {
+    background-color: var(--dark-color);
+    border-color: var(--dark-color);
+    color: var(--light-color);
+    margin: 2px;
+}
+
+.back-to-lists-btn:hover {
+    background-color: #f5f5f5;
 }
 
 .text-primary {
@@ -130,7 +156,6 @@ body {
 }
 
 
-/* SIGN UP */
 
 /* SIGN UP */
 
