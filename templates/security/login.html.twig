@@ -5,25 +5,24 @@
   <meta charset="UTF-8">
   <title>GiftWish - Log In</title>
 
+  {# Import Pacifico (for the logo) and Work Sans (for the rest) #}
   <link
     rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Pacifico&family=Work+Sans:wght@300;400;500;600;700&display=swap"
   >
-
+  {# Use the same CSS file as signup to maintain layout consistency #}
   <link rel="stylesheet" href="{{ asset('css/signup.css') }}">
 </head>
 <body>
 
-
+  {# Top-right link: "Not a member? Sign up" #}
   <a href="{{ path('app_signup') }}" class="member-link">
     Not a member ?
     <span>Sign up</span>
   </a>
 
-
   <div class="signup-container">
-
-
+    {# LEFT PANEL: Background image with overlay, logo and tagline #}
     <div class="left-panel" style="background-image: url('{{ asset("assets/image (10).png") }}');">
       <div class="overlay"></div>
       <div class="left-content">
@@ -32,36 +31,30 @@
       </div>
     </div>
 
-
+    {# RIGHT PANEL: Login form #}
     <div class="right-panel">
       <h1>Log in</h1>
-      <form method="POST" class="signup-form">
-        {# Adapt these fields to your needs (e.g. Symfony forms) #}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email address"
-          class="form-control"
-          required
-        >
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          class="form-control"
-          required
-        >
-        {# CSRF token if needed #}
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-        <button type="submit" class="signup-btn">Log in</button>
+      {# Display error if exists #}
+      {% if error %}
+          <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+      {% endif %}
+
+      {# Login form replacing manual inputs with the provided markup #}
+      <form method="post" class="signup-form">
+          <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+          
+          <input type="password" name="password" id="inputPassword" class="form-control" placeholder="Password" required>
+          
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+          
+          <button type="submit" class="signup-btn">Log in</button>
       </form>
 
-    
+
     </div>
   </div>
 
-  <!-- Footer (bottom-right corner) -->
   <footer class="footer">
     M.T-ATLANTIQUE@2025
   </footer>
