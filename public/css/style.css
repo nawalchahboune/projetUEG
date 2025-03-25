@@ -10,6 +10,16 @@
     --danger-color: #a12d25;
 }
 
+/* Button icon styling */
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
 /* Override Bootstrap colors */
 .btn-primary {
     background-color: var(--primary-color);
