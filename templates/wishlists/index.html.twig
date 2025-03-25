@@ -51,6 +51,19 @@
         </div>
     {% endif %}
 </div>
+<div>
+        <h2>Add friends to your wishlist</h2>
+        <input type="hidden" id="wishlist-id" value="{{ wishlist.id }}">
+        <div>
+            {% for user in users %}
+                <label>
+                    <input type="checkbox" class="user-checkbox" value="{{ user.id }}">
+                    {{ user.username }}
+                </label>
+            {% endfor %}
+        </div>
+        <button id="share-wishlist-button">Add friends to your wishlist</button>
+    </div>
 <div id="share-popup" class="share-popup hidden">
     <div class="share-popup-content">
         <h2>Share Your Wishlist</h2>
