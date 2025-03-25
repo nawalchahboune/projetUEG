@@ -1,26 +1,15 @@
 {# templates/home.html.twig #}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>GiftWish - Home</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap">
+{% extends 'base.html.twig' %}
 
+{% block title %}GiftWish - Home{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
   <link rel="stylesheet" href="{{ asset('css/home.css') }}">
-</head>
-<body>
+{% endblock %}
 
 
-  <nav class="navbar">
-    <div class="nav-left">
-      <div class="logo">GiftWish</div>
-    </div>
-    <div class="nav-right">
-      <a href="{{ path('app_login') }}">Log In</a>
-      <a href="{{ path('app_signup') }}" class="btn-signup">Sign Up</a>
-    </div>
-  </nav>
-
+{% block body %}
 
 <section class="hero">
   <!-- Left: Gift Image -->
@@ -120,5 +109,4 @@
     <p>&copy; 2025 GiftWish</p>
   </footer>
 
-</body>
-</html>
+{% endblock %}
