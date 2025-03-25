@@ -65,6 +65,17 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
         }
         return $this->publicToken;
     }
+    public function setPublicToken(): void
+    {
+        if ($this->publicToken === null) {
+            $this->publicToken = Uuid::v4()->toRfc4122();
+        }
+    }
+    public function setCollaborationToken(){
+        if ($this->collaborationToken === null) {
+            $this->collaborationToken = Uuid::v4()->toRfc4122();
+        }
+    }
 
     public function refreshPublicToken(): self
     {

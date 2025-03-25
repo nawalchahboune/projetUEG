@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Add New Item{% endblock %}
+{% block title %}Ajouter un Item{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -111,8 +111,8 @@
         </div>
         
         <div class="form-actions">
-            <a href="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': 0}) }}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">Save Item</button>
+                            <a href="{{ path('app_wishlist_show', {'id': wishlist.id}) }}" class="btn btn-secondary">Annuler</a>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
         </div>
     {{ form_end(form) }}
 </div>
