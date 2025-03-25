@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/myWishlist')]
@@ -30,6 +31,7 @@ class WishlistController extends AbstractController
             'items' => $wishlist->getItems(),
         ]);
     }
+    /*
 
     #[Route('/{id}/insertItem', name: 'app_wishlist_insert_item')]
     public function insertItem(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
@@ -115,7 +117,7 @@ class WishlistController extends AbstractController
         }
         
         return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlistId]);
-    }
+    }*/
 
     #[Route('/{id}/deleteWishlist', name: 'app_wishlist_delete_wishlist', methods: ['POST'])]
     public function deleteWishlist(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
@@ -163,5 +165,33 @@ class WishlistController extends AbstractController
         }
         
         return new RedirectResponse($url);
+    }
+    #[Route('/wishlist/{id}/share', name: 'wishlist_share')]
+    public function share(Wishlist $wishlist): Response
+    {
+        // Check if current user is owner
+        if ($wishlist->getOwner() !== $this->getUser()) {
+            $this->addFlash('error', 'Vous n\'avez pas l\'autorisation de partager cette liste.');
+            return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+        }
+        
+        // Generate URLs
+        $collaborationUrl = $this->generateUrl(
+            'wishlist_collaborate', 
+            ['token' => $wishlist->getCollaborationToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        
+        $publicUrl = $this->generateUrl(
+            'wishlist_public',
+            ['token' => $wishlist->getPublicToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        
+        return $this->render('wishlist/share.html.twig', [
+            'wishlist' => $wishlist,
+            'collaborationUrl' => $collaborationUrl,
+            'publicUrl' => $publicUrl
+        ]);
     }
 }

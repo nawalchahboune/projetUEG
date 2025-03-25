@@ -12,6 +12,7 @@ use MyWishlistPage;
 use Symfony\Component\Validator\Constraints as Assert;
 use ViewUserWishlist;
 use App\Entity\Item;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: WishlistRepository::class)]
 class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWishlistPage
@@ -38,6 +39,41 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'collaborativeWishlists')]
     private Collection $collaborators;
 
+    // #[ORM\Column(length: 36, unique: true, nullable: true)]
+    private ?string $collaborationToken = null;
+
+  //  #[ORM\Column(length: 36, unique: true, nullable: true)]
+    private ?string $publicToken = null;
+
+    // ...existing relationships and methods
+
+    public function getCollaborationToken(): ?string
+    {
+        if ($this->collaborationToken === null) {
+            $this->collaborationToken = Uuid::v4()->toRfc4122();
+        }
+        return $this->collaborationToken;
+    }
+    public function refreshCollaborationToken(): self
+    {
+        $this->collaborationToken = Uuid::v4()->toRfc4122();
+        return $this;
+    }
+
+    public function getPublicToken(): ?string
+    {
+        if ($this->publicToken === null) {
+            $this->publicToken = Uuid::v4()->toRfc4122();
+        }
+        return $this->publicToken;
+    }
+
+    public function refreshPublicToken(): self
+    {
+        $this->publicToken = Uuid::v4()->toRfc4122();
+        return $this;
+    }
+// composer require symfony/uid
     public function __construct(?string $name=null, ?DateTimeInterface $deadline=null )
     {
         $this->name = $name;
