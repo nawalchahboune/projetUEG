@@ -1,49 +1,32 @@
 .share-popup {
  position: fixed;
+ top: 50%;
+ left: 50%;
+ transform: translate(-50%, -50%);
+ background-color: white;
+ border: 1px solid #ddd;
+ border-radius: 8px;
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+ z-index: 1000;
+ padding: 20px;
+ display: none; /* Caché par défaut */
+}
+
+.share-popup-content {
+ text-align: center;
+}
+
+.hidden {
+ display: none;
+}
+
+.share-popup-overlay {
+ position: fixed;
  top: 0;
  left: 0;
  width: 100%;
  height: 100%;
- background-color: rgba(0, 0, 0, 0.5);
- display: flex;
- justify-content: center;
- align-items: center;
- z-index: 1000;
-}
-
-.share-popup.hidden {
- display: none;
-}
-
-.share-popup-content {
- background-color: white;
- padding: 2rem;
- border-radius: 8px;
- text-align: center;
- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
- max-width: 400px;
- width: 90%;
-}
-
-.share-popup-content h2 {
- margin-bottom: 1rem;
- font-size: 1.5rem;
-}
-
-.share-popup-content p {
- margin-bottom: 1rem;
- color: #666;
-}
-
-.share-popup-content input {
- width: 100%;
- padding: 0.5rem;
- margin-bottom: 1rem;
- border: 1px solid #ddd;
- border-radius: 4px;
- font-size: 1rem;
-}
-
-.share-popup-content button {
- margin: 0.5rem;
+ background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+ z-index: 999;
+ display: none; /* Caché par défaut */
 }

@@ -19,6 +19,7 @@ final class Version20250315151445 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE item (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) DEFAULT NULL, price DOUBLE PRECISION NOT NULL, has_purchased TINYINT(1) NOT NULL, url VARCHAR(255) DEFAULT NULL, wishlist_id INT NOT NULL, INDEX IDX_1F1B251EFB8E54CD (wishlist_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8');
         $this->addSql('CREATE TABLE proof (id INT AUTO_INCREMENT NOT NULL, congrats_message VARCHAR(255) NOT NULL, proof VARCHAR(255) DEFAULT NULL, buyer_id INT DEFAULT NULL, INDEX IDX_FBF940DD6C755722 (buyer_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8');

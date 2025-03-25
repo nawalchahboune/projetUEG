@@ -425,7 +425,6 @@
             {% for item in items %}
 
                 <div class="item-card">
-<<<<<<< HEAD
                     <div class="item-image-container">
                                 {% if aim is defined and aim == 'toBuy' and (not item.hasPurchased) %}
                                   <button class="btn btn-primary">Add Proof</button>    
@@ -440,36 +439,21 @@
                          </a>
                         {% endif %}
 
-                        
+                        <div class="item-actions">
+                            <a href="{{ path('edit_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="btn btn-icon btn-creer">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            
+                            <a href="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="btn btn-icon btn-supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
                         {% if item.hasPurchased|default(false) %}
                             <div class="purchased-overlay">
                                 <div class="purchased-text">Déjà réservé</div>
                             </div>
                         {% endif %}
                     </div>
-=======
-<div class="item-image-container">
-    <div class="item-actions">
-        <a href="{{ path('edit_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="btn btn-icon btn-creer">
-            <i class="fas fa-edit"></i>
-        </a>
-        
-        <a href="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="btn btn-icon btn-supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
-            <i class="fas fa-trash"></i>
-        </a>
-    </div>
-
-    {% if item.price %}
-        <div class="item-price">{{ item.price|number_format(2, ',', ' ') }} €</div>
-    {% endif %}
-    
-    {% if item.isPurchased|default(false) %}
-        <div class="purchased-overlay">
-            <div class="purchased-text">Déjà réservé</div>
-        </div>
-    {% endif %}
-</div>
->>>>>>> cc30dcaecc9a25acf04f1abc203190562dd45d14
                     
                     <div class="item-content">
                         <h3 class="item-name">{{ item.name }}</h3>
@@ -480,14 +464,9 @@
                                 <a href="{{ item.url }}" target="_blank" class="view-btn">
                                     <i class="fas fa-shopping-cart"></i> Voir en boutique
                                 </a>
-<<<<<<< HEAD
 
                                 {% else %}
                                 <p class="view-btn" > Aucun URL n'est fournie!</p>
-=======
-                            {% else %}
-                                <p class="view-btn">Aucun URL n'est fournie!</p>
->>>>>>> cc30dcaecc9a25acf04f1abc203190562dd45d14
                             {% endif %}
                         </div>
                     </div>
