@@ -5,25 +5,21 @@
   <meta charset="UTF-8">
   <title>GiftWish - Sign Up</title>
 
-  <link
-    rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Pacifico&family=Work+Sans:wght@300;400;500;600;700&display=swap"
-  >
-
+  {# Import Pacifico (for the logo) and Work Sans (for the rest) #}
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pacifico&family=Work+Sans:wght@300;400;500;600;700&display=swap">
   <link rel="stylesheet" href="{{ asset('css/signup.css') }}">
 </head>
 <body>
 
-
+  {# "Already a member? Sign in" pinned in the top-right #}
   <a href="{{ path('app_login') }}" class="member-link">
     Already a member ?
     <span>Sign in</span>
   </a>
 
-
   <div class="signup-container">
 
-
+    {# LEFT PANEL (1/3 width) with background image, overlay, logo and tagline #}
     <div class="left-panel" style="background-image: url('{{ asset("assets/image (10).png") }}');">
       <div class="overlay"></div>
       <div class="left-content">
@@ -32,42 +28,67 @@
       </div>
     </div>
 
-
+    {# RIGHT PANEL (2/3 width) containing flash messages and the registration form #}
     <div class="right-panel">
       <h1>Sign up</h1>
-      <form method="POST" class="signup-form">
-        {# Adapt these fields to your needs (e.g. Symfony forms) #}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email address"
-          class="form-control"
-          required
-        >
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          class="form-control"
-          required
-        >
-        <input
-          type="password"
-          name="repeat_password"
-          placeholder="Repeat Password"
-          class="form-control"
-          required
-        >
-        {# CSRF token if needed #}
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-        <button type="submit" class="signup-btn">Sign up</button>
-      </form>
-
+      {# Flash messages for errors and success #}
+      {% for flash_error in app.flashes('verify_email_error') %}
+          <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+      {% endfor %}
       
+      {% for flash_message in app.flashes('success') %}
+          <div class="alert alert-success" role="alert">{{ flash_message }}</div>
+      {% endfor %}
+      
+      {# Render the registration form using Symfony form helpers #}
+      {{ form_start(registrationForm, {'attr': {'class': 'signup-form'}}) }}
+        
+        <div class="form-group">
+          {{ form_row(registrationForm.email, {
+              'attr': {'class': 'form-control', 'placeholder': 'Email address'}
+          }) }}
+        </div>
+        
+        <div class="form-group">
+          {{ form_row(registrationForm.username, {
+              'attr': {'class': 'form-control', 'placeholder': 'Nom d\'utilisateur'}
+          }) }}
+        </div>
+        
+        <div class="form-group">
+          {{ form_row(registrationForm.firstName, {
+              'attr': {'class': 'form-control', 'placeholder': 'Prénom'}
+          }) }}
+        </div>
+        
+        <div class="form-group">
+          {{ form_row(registrationForm.lastName, {
+              'attr': {'class': 'form-control', 'placeholder': 'Nom'}
+          }) }}
+        </div>
+        
+        <div class="form-group">
+          {{ form_row(registrationForm.plainPassword.first, {
+              'attr': {'class': 'form-control', 'placeholder': 'Mot de passe'}
+          }) }}
+        </div>
+        
+        <div class="form-group">
+          {{ form_row(registrationForm.plainPassword.second, {
+              'attr': {'class': 'form-control', 'placeholder': 'Confirmer le mot de passe'}
+          }) }}
+        </div>
+        
+        <div class="form-group">
+          {{ form_row(registrationForm.agreeTerms) }}
+        </div>
+        
+        <button type="submit" class="signup-btn">Sign up</button>
+      
+      {{ form_end(registrationForm) }}
     </div>
   </div>
-
 
   <footer class="footer">
     M.T-ATLANTIQUE@2025
