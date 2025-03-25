@@ -66,4 +66,13 @@
         </div>
     {% endif %}
 </div>
+<div id="share-popup" class="share-popup hidden">
+    <div class="share-popup-content">
+        <h2>Share Your Wishlist</h2>
+        <p>Use the link below to share your wishlist with friends and family.</p>
+        <input type="text" id="share-link" value="{{ path('wishlist_public', {'token': wishlist.publicToken}, absolute=true) }}" readonly>
+        <button id="copy-link-btn" class="btn btn-info">Copy Link</button>
+        <button id="close-popup-btn" class="btn btn-secondary">Close</button>
+    </div>
+</div>
 {% endblock %}
