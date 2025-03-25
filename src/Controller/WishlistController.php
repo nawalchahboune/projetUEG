@@ -198,7 +198,7 @@ class WishlistController extends AbstractController
         );
         
         $publicUrl = $this->generateUrl(
-            'wishlist_public',
+            'ViewUserWishlist',
             ['token' => $wishlist->getPublicToken()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
