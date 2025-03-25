@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Wishlist;
 use App\Entity\Invitation;
 use App\Controller\WishlistType;
+use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Repository\WishlistRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,7 +23,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class WishlistsController extends AbstractController
 {
     #[Route('/', name: 'app_wishlists_index')]
-    public function index(WishlistRepository $wishlistRepository): Response
+    public function index(WishlistRepository $wishlistRepository,UserRepository $userRepository): Response
     {
         // Récupérer l'utilisateur connecté
         $user = $this->getUser();
@@ -33,13 +34,15 @@ class WishlistsController extends AbstractController
             // Ou rediriger vers la page de login
             // return $this->redirectToRoute('app_login');
         }
+        $users = $userRepository->findAll();
         
         // Récupérer toutes les wishlists dont l'utilisateur est propriétaire
         $wishlists = $wishlistRepository->findBy(['owner' => $user]);
         
         return $this->render('wishlists/index.html.twig', [
             'wishlists' => $wishlists,
-
+            'users'=>$users
+            
         ]);
     }
 
@@ -48,6 +51,8 @@ class WishlistsController extends AbstractController
     {
         $wishlist = new Wishlist();
         $wishlist->setOwner($this->getUser());
+        $wishlist->setPublicToken();
+        $wishlist->setCollaborationToken();
         
         $form = $this->createForm(WishlistType::class, $wishlist);
         $form->handleRequest($request);

@@ -54,4 +54,33 @@ final class ItemController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/{idItem}/edit', name: 'edit_item')]
+    public function edit(int $idWishlist, int $idItem, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $wishlist = $entityManager->getRepository(Wishlist::class)->find($idWishlist);
+        $item = $entityManager->getRepository(Item::class)->find($idItem);
+        
+        // Check if item exists and belongs to this wishlist
+        if (!$item || $item->getWishlist()->getId() !== $wishlist->getId()) {
+            throw $this->createNotFoundException('Item not found in this wishlist');
+        }
+        
+        $form = $this->createForm(ItemFormType::class, $item);
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+            
+            return $this->redirectToRoute('app_wishlist_show', [
+                'id' => $idWishlist
+            ]);
+        }
+        
+        return $this->render('item/editItem.html.twig', [
+            'wishlist' => $wishlist,
+            'item' => $item,
+            'form' => $form->createView(),
+        ]);
+    }
 }

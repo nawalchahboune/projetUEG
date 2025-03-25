@@ -307,6 +307,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     {
         // A IMPLEMENTER !
     }
+  
 
 
 }

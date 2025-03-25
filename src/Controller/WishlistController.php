@@ -15,9 +15,28 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/myWishlist')]
-#[IsGranted('ROLE_USER')]
 class WishlistController extends AbstractController
 {
+
+    #[Route('/token', name: 'app_wishlist_public')]
+    public function public(Request $request , EntityManagerInterface $entityManager): Response
+    {
+        $token = $request->query->get('token');
+        $wishlist = $entityManager->getRepository(Wishlist::class)->findOneBy(['publicToken' => $token]);
+        
+        if (!$wishlist) {
+            throw $this->createNotFoundException('La liste de souhaits n\'existe pas');
+        }
+        $user= $this->getUser();
+        
+        return $this->render('wishlist/index.html.twig', [
+            'wishlist' => $wishlist,
+            'items' => $wishlist->getItems(),
+            'user' => $user,
+            'aim'=>'toBuy'
+        ]);
+    }
+    #[IsGranted('ROLE_USER')]
     #[Route('/{id}', name: 'app_wishlist_show')]
     public function show(Wishlist $wishlist): Response
     {
@@ -118,7 +137,7 @@ class WishlistController extends AbstractController
         
         return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlistId]);
     }*/
-
+    #[IsGranted('ROLE_USER')]
     #[Route('/{id}/deleteWishlist', name: 'app_wishlist_delete_wishlist', methods: ['POST'])]
     public function deleteWishlist(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
@@ -134,7 +153,7 @@ class WishlistController extends AbstractController
             $this->addFlash('success', 'Votre liste de souhaits a été supprimée');
         }
         
-        return $this->redirectToRoute('app_home');
+        return $this->redirectToRoute('app_wishlists_index');
     }
 
     #[Route('/{wishlistId}/goToOfficialWebsite/{itemId}', name: 'app_wishlist_go_to_official_website')]
@@ -166,6 +185,7 @@ class WishlistController extends AbstractController
         
         return new RedirectResponse($url);
     }
+    #[IsGranted('ROLE_USER')]
     #[Route('/wishlist/{id}/share', name: 'wishlist_share')]
     public function share(Wishlist $wishlist): Response
     {
@@ -183,7 +203,7 @@ class WishlistController extends AbstractController
         );
         
         $publicUrl = $this->generateUrl(
-            'wishlist_public',
+            'ViewUserWishlist',
             ['token' => $wishlist->getPublicToken()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
