@@ -39,10 +39,10 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'collaborativeWishlists')]
     private Collection $collaborators;
 
-    // #[ORM\Column(length: 36, unique: true, nullable: true)]
+    #[ORM\Column(length: 36, unique: true, nullable: true ,name: 'collaboration_token')]
     private ?string $collaborationToken = null;
 
-  //  #[ORM\Column(length: 36, unique: true, nullable: true)]
+    #[ORM\Column(length: 36, unique: true, nullable: true, name:'public_token')]
     private ?string $publicToken = null;
 
     // ...existing relationships and methods

@@ -75,17 +75,71 @@
                         </div>
                     </div>
                 </div>
+                
             {% endfor %}
+            
+            
         </div>
     {% endif %}
 </div>
-<div id="share-popup" class="share-popup hidden">
-    <div class="share-popup-content">
-        <h2>Share Your Wishlist</h2>
-        <p>Use the link below to share your wishlist with friends and family.</p>
-        <input type="text" id="share-link" value="{{ url('wishlist_public', {'token': wishlist.publicToken}, absolute=true) }}" readonly>
-        <button id="copy-link-btn" class="btn btn-info">Copy Link</button>
-        <button id="close-popup-btn" class="btn btn-secondary">Close</button>
-    </div>
-</div>
+{% endblock %}
+
+
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sélectionner tous les boutons de partage
+        const shareButtons = document.querySelectorAll('.share-wishlist-btn');
+        
+        // Ajouter un écouteur d'événement à chaque bouton de partage
+        shareButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const wishlistId = this.getAttribute('data-id');
+                const popup = document.getElementById('share-popup-' + wishlistId);
+                popup.classList.remove('hidden');
+            });
+        });
+        
+        // Gérer la fermeture des popups
+        const closeButtons = document.querySelectorAll('.close-popup-btn');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const wishlistId = this.getAttribute('data-id');
+                const popup = document.getElementById('share-popup-' + wishlistId);
+                popup.classList.add('hidden');
+            });
+        });
+        
+        // Gérer la copie du lien
+        const copyButtons = document.querySelectorAll('.copy-link-btn');
+        copyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const wishlistId = this.getAttribute('data-id');
+                const linkInput = document.getElementById('share-link-' + wishlistId);
+                
+                // Sélectionner le texte
+                linkInput.select();
+                linkInput.setSelectionRange(0, 99999); // Pour mobile
+                
+                // Copier le texte
+                navigator.clipboard.writeText(linkInput.value)
+                    .then(() => {
+                        // Indiquer que le lien a été copié
+                        const originalText = this.textContent;
+                        this.textContent = 'Copié !';
+                        
+                        // Rétablir le texte original après 2 secondes
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Erreur lors de la copie: ', err);
+                    });
+            });
+        });
+    });
+</script>
 {% endblock %}

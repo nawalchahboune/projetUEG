@@ -36,7 +36,7 @@ class WishlistsController extends AbstractController
         
         return $this->render('wishlists/index.html.twig', [
             'wishlists' => $wishlists,
-
+            
         ]);
     }
 

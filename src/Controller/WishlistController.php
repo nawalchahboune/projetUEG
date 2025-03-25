@@ -18,6 +18,21 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class WishlistController extends AbstractController
 {
+
+    #[Route('/token', name: 'app_wishlist_public')]
+    public function public(string $token, EntityManagerInterface $entityManager): Response
+    {
+        $wishlist = $entityManager->getRepository(Wishlist::class)->findOneBy(['publicToken' => $token]);
+        
+        if (!$wishlist) {
+            throw $this->createNotFoundException('La liste de souhaits n\'existe pas');
+        }
+        
+        return $this->render('wishlist/index.html.twig', [
+            'wishlist' => $wishlist,
+            'items' => $wishlist->getItems(),
+        ]);
+    }
     #[Route('/{id}', name: 'app_wishlist_show')]
     public function show(Wishlist $wishlist): Response
     {
@@ -183,7 +198,7 @@ class WishlistController extends AbstractController
         );
         
         $publicUrl = $this->generateUrl(
-            'wishlist_public',
+            'ViewUserWishlist',
             ['token' => $wishlist->getPublicToken()],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
