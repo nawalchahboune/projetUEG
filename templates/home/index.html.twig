@@ -83,30 +83,16 @@
 
 
   <section class="get-app">
-    <h2>Get the GiftWish app</h2>
+    <h2>Shop effortlessly!</h2>
     <div class="app-wrapper">
       <img src="{{ asset('assets/image (8).png') }}" alt="GiftWish app" class="app-img">
       <div class="app-details">
-        <h3>Shop effortlessly!</h3>
         <p>Surprise your loved ones with gifts from their wishlist. Explore a wide range of options from top brands.</p>
-        <a href="#" class="btn">Get app</a>
+            
+                <a href="{{ path('app_login') }}" class="btn">Log In</a>
+                <a href="{{ path('app_signup') }}" class="btn btn-outline">Sign Up</a>
+           
       </div>
     </div>
   </section>
-
-
-  {% if not is_granted('ROLE_USER') %}
-    <section class="cta">
-      <p>Get started today:</p>
-      <a href="{{ path('app_login') }}" class="btn">Log In</a>
-      <a href="{{ path('app_signup') }}" class="btn btn-outline">Sign Up</a>
-    </section>
-  {% endif %}
-
-
-  <footer class="footer">
-    <p>Gift • Social Media • Connect • Community</p>
-    <p>&copy; 2025 GiftWish</p>
-  </footer>
-
 {% endblock %}
