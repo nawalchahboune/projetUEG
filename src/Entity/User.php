@@ -56,15 +56,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     #[ORM\Column(type: 'string', length: 20)]
     private ?string $type = 'user';
 
-    private ?Invitation $invitation = null;
-
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Wishlist::class, orphanRemoval: true)]
     private Collection $ownedWishlists;
 
     #[ORM\ManyToMany(targetEntity: Wishlist::class, mappedBy: 'collaborators')]
     private Collection $collaborativeWishlists;
 
-    #[ORM\OneToMany(mappedBy: 'receivers', targetEntity: Invitation::class, orphanRemoval: true)]
     private Collection $myInvitations;
 
     #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: Notification::class, orphanRemoval: true)]
@@ -237,6 +234,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
         return $this;
     }
 
+    /**
+     * @return Collection<int, Invitation>
+     */
+    public function getMyInvitations(): Collection
+    {
+        return $this->myInvitations;
+    }
+
+    public function addInvitation(Invitation $invitation): self
+    {
+        if (!$this->myInvitations->contains($invitation)) {
+            $this->myInvitations->add($invitation);
+            $invitation->setReceiver($this);
+        }
+
+        return $this;
+    }
+
+
     // Required methods for UserInterface
     public function getRoles(): array
     {
@@ -291,6 +307,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     {
         // A IMPLEMENTER !
     }
+  
 
 
 }

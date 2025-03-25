@@ -42,15 +42,15 @@ class WishlistRepository extends ServiceEntityRepository
     //    }
 
     public function findTop3WishlistsByTotalValue(): array
-    {
-        return $this->createQueryBuilder('w')
-            ->select('w', 'SUM(i.price) as totalValue')
-            ->join('w.items', 'i')
-            ->groupBy('w')
-            ->orderBy('totalValue', 'DESC')
-            ->setMaxResults(3)
-            ->getQuery()
-            ->getResult();
-    }
-    
+{
+    return $this->createQueryBuilder('w')
+        ->select('w', 'SUM(i.price) as totalValue', 'u.username as ownerName')
+        ->join('w.items', 'i') // Jointure avec les items
+        ->join('w.owner', 'u') // Jointure avec le propriétaire (relation ManyToOne ou OneToMany)
+        ->groupBy('w')
+        ->orderBy('totalValue', 'DESC')
+        ->setMaxResults(3)
+        ->getQuery()
+        ->getResult();
+}
 }
