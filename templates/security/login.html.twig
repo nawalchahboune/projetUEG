@@ -35,9 +35,6 @@
     <div class="right-panel">
       <h1>Log in</h1>
 
-<<<<<<< HEAD
-        <button type="submit" class="signup-btn" >Log in</button>
-=======
       {# Display error if exists #}
       {% if error %}
           <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -52,7 +49,6 @@
           <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
           
           <button type="submit" class="signup-btn">Log in</button>
->>>>>>> daa8a4639b6d5d8cafc61ee172cb668e3a0255dd
       </form>
 
 
