@@ -1,20 +1,16 @@
-{# filepath: templates/wishlist/index.html.twig #}
+{# templates/wishlist/index.html.twig #}
 {% extends 'base.html.twig' %}
-
-{% block head %}
-    {{ parent() }}
-    <meta name="csrf-token" content="{{ csrf_token('share_wishlist') }}">
-{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/poopup.css') }}">
 {% endblock %}
 
 {% block title %}Mes listes de souhaits{% endblock %}
 
 {% block body %}
 <div class="container">
-    <!-- Header Section -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h4>Mes listes de souhaits</h4>
@@ -24,7 +20,7 @@
         </div>
     </div>
 
-    <!-- Profile Section -->
+    {# Zone d'image avec augmentation de l'espace sous l'image pour pousser la zone vers le bas #}
     <div class="profile-header mb-4">
         <img src="{{ asset('images/gifts.jpg') }}" alt="cover pic" class="header-image">
         <div class="profile-pic-container">
@@ -32,15 +28,13 @@
         </div>
     </div>
 
-    <!-- User Info -->
-    {% if is_granted('ROLE_USER') %}
-        <div class="mb-4">
-            <h3>{{ app.user.username }}</h3>
-        </div>
-    {% endif %}
+    <div class="row-md-4 mb-4">
+        {% if is_granted('ROLE_USER') %} 
+            <h3>{{ app.user.username }}</h3> 
+        {% endif %}
+    </div>
 
-    <!-- Wishlist Section -->
-    <div class="container">
+    <div class="container" style="margin-top: 100px;"> {# Augmentation de l'espace entre l'image et la zone de boutons #}
         {% if wishlists is empty %}
             <div class="alert alert-info">Vous n'avez pas encore créé de liste de souhaits.</div>
         {% else %}
@@ -48,46 +42,43 @@
                 {% for wishlist in wishlists %}
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
-                            <div class="card-body d-flex flex-column">
-                                <!-- Wishlist Title and Deadline -->
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="card-title mb-0">{{ wishlist.name }}</h5>
-                                    <p class="card-text mb-0">
-                                        Date limite: {{ wishlist.deadline ? wishlist.deadline|date('d/m/Y') : 'Non définie' }}
+                            <div class="card-body d-flex flex-column h-100">
+
+                                {# Titre de la wishlist #}
+                                <h5 class="card-title mb-3">{{ wishlist.name }}</h5>
+
+                                {# Zone contenant la date et les boutons #}
+                                <div class="mt-auto py-3">
+                                    <p class="card-text">
+                                        <strong>Date limite:</strong> {{ wishlist.deadline ? wishlist.deadline|date('d/m/Y') : 'Non définie' }}
                                     </p>
-                                </div>
 
-                                <!-- Wishlist Actions -->
-                                <div class="btn-group d-flex justify-content-between">
-                                    <a href="{{ path('app_wishlist_show', {'id': wishlist.id}) }}" class="btn btn-primary flex-fill me-1 text-center">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ path('app_wishlists_edit', {'id': wishlist.id}) }}" class="btn btn-warning flex-fill me-1 text-center">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                    <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste?');" style="display: inline;" class="flex-fill me-1">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
-                                        <button type="submit" class="btn btn-supprimer w-100 text-center">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                    
-                                    <button class="btn btn-creer flex-fill text-center share-wishlist-btn" data-id="{{ wishlist.id }}">
-                                        <i class="fas fa-share-alt"></i>
+                                    <div class="btn-group d-flex justify-content-between">
+                                        <a href="{{ path('app_wishlist_show', {'id': wishlist.id}) }}" class="btn btn-primary flex-fill me-1 text-center">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_wishlists_edit', {'id': wishlist.id}) }}" class="btn btn-warning flex-fill me-1 text-center">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste?');" style="display: inline;" class="flex-fill me-1">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
+                                            <button type="submit" class="btn btn-supprimer w-100 text-center">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                        <button class="btn btn-creer flex-fill text-center share-wishlist-btn" data-id="{{ wishlist.id }}">
+                                    <i class="fas fa-share-alt"></i>
                                 </button>
-                            </div>
+                                <div id="share-popup-{{ wishlist.id }}" class="share-popup hidden">
+                                    <div class="share-popup-content">
+                                        <h2>Share Your Wishlist</h2>
+                                        <p>Use the link below to share your wishlist with friends and family.</p>
+                                        <input type="text" id="share-link-{{ wishlist.id }}" value="{{ url('app_wishlist_public', {'token': wishlist.publicToken}) }}" readonly>
+                                        <button class="btn btn-info copy-link-btn" data-id="{{ wishlist.id }}">Copy Link</button>
+                                        <button class="btn btn-secondary close-popup-btn" data-id="{{ wishlist.id }}">Close</button>
+                                    </div>
+                                </div>
 
-                            <!-- Share Popup -->
-                            <div id="share-popup-{{ wishlist.id }}" class="share-popup hidden">
-                                <div class="share-popup-content">
-                                    <h2>Share Your Wishlist</h2>
-                                    <p>Use the link below to share your wishlist with friends and family.</p>
-                                    <input type="text" id="share-link-{{ wishlist.id }}" value="{{ url('app_wishlist_public', {'token': wishlist.publicToken}) }}" readonly>
-                                    <button class="btn btn-info copy-link-btn" data-id="{{ wishlist.id }}">Copy Link</button>
-                                    <button class="btn btn-secondary close-popup-btn" data-id="{{ wishlist.id }}">Close</button>
-                                </div>
-                            </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -95,70 +86,42 @@
             </div>
         {% endif %}
     </div>
+
 </div>
 {% endblock %}
+
 {% block javascripts %}
 {{ parent() }}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Cacher TOUS les popups au chargement initial
-        const popups = document.querySelectorAll('.share-popup');
-        popups.forEach(popup => {
-            popup.classList.add('hidden');
-            popup.style.display = 'none'; // Ajout de cette ligne pour forcer le masquage
-        });
-
-        // Gestion des boutons de partage
         const shareButtons = document.querySelectorAll('.share-wishlist-btn');
+
         shareButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.stopPropagation(); // Empêcher la propagation du clic
-
-                // Masquer tous les autres popups d'abord
-                popups.forEach(p => {
-                    p.classList.add('hidden');
-                    p.style.display = 'none';
-                });
-
-                // Afficher uniquement le popup correspondant
+            button.addEventListener('click', function() {
                 const wishlistId = this.getAttribute('data-id');
                 const popup = document.getElementById('share-popup-' + wishlistId);
                 popup.classList.remove('hidden');
-                popup.style.display = 'block'; // Assurer que le popup s'affiche
             });
         });
 
-        // Gestion des boutons de fermeture
         const closeButtons = document.querySelectorAll('.close-popup-btn');
         closeButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const wishlistId = this.getAttribute('data-id');
                 const popup = document.getElementById('share-popup-' + wishlistId);
                 popup.classList.add('hidden');
-                popup.style.display = 'none';
             });
         });
 
-        // Fermeture des popups en cliquant à l'extérieur
-        document.addEventListener('click', function(event) {
-            const openPopups = document.querySelectorAll('.share-popup:not(.hidden)');
-            openPopups.forEach(popup => {
-                if (!popup.contains(event.target) && 
-                    !event.target.closest('.share-wishlist-btn')) {
-                    popup.classList.add('hidden');
-                    popup.style.display = 'none';
-                }
-            });
-        });
-
-        // Gestion de la copie du lien
         const copyButtons = document.querySelectorAll('.copy-link-btn');
         copyButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const wishlistId = this.getAttribute('data-id');
                 const linkInput = document.getElementById('share-link-' + wishlistId);
                 
-                // Copier le lien
+                linkInput.select();
+                linkInput.setSelectionRange(0, 99999); 
+
                 navigator.clipboard.writeText(linkInput.value)
                     .then(() => {
                         const originalText = this.textContent;
