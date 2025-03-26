@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Wishlist;
+use App\Entity\Invitation;
 use App\Controller\WishlistType;
 use App\Repository\UserRepository;
+use App\Entity\User;
 use App\Repository\WishlistRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,6 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[Route('/myWishlists')]
 #[IsGranted('ROLE_USER')]
@@ -145,5 +148,31 @@ class WishlistsController extends AbstractController
         ]);
     }
 
-    
+    #[Route('/{id}/share', name: 'wishlist_share', methods: ['POST'])]
+    public function shareWishlist(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
+    {
+        // Check if current user is owner
+        if ($wishlist->getOwner() !== $this->getUser()) {
+            $this->addFlash('error', 'Vous n\'avez pas l\'autorisation de partager cette liste.');
+            return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+        }
+
+        $userIds = $request->request->get('user_ids');
+        if (is_array($userIds)) {
+            $users = new ArrayCollection();
+
+            foreach ($userIds as $userId) {                
+                $user = $entityManager->getRepository(User::class)->find($userId);                
+                if ($user) {                    
+                    $user->addInvitation(new Invitation($wishlist, $this->getUser(), $user));
+                }
+            }
+        }
+        $entityManager->flush();
+
+
+
+        $this->addFlash('success', 'La liste de souhaits a été partagée avec succès.');
+        return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+    }
 }

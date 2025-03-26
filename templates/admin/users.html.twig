@@ -20,7 +20,7 @@
         </form>
     </div>
 
-    {# Example of a success/error message block #}
+    {# Success/Error messages #}
     {% for message in app.flashes('success') %}
         <div class="alert alert-success">{{ message }}</div>
     {% endfor %}
@@ -34,8 +34,15 @@
                 <div class="card shadow-sm">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="card-title mb-0">{{ user.username }}</h5>
-                            {# Example of locked or active badge #}
+                            <div>
+                                <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                {% if user.type == 'admin' %}
+                                    <span class="badge bg-info">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">User</span>
+                                {% endif %}
+                            </div>
+                            {# Locked/Active badge #}
                             {% if user.lockStatus %}
                                 <span class="badge bg-danger">Locked</span>
                             {% else %}

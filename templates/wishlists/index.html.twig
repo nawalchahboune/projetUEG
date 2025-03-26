@@ -1,9 +1,13 @@
 {# filepath: templates/wishlist/index.html.twig #}
 {% extends 'base.html.twig' %}
 
+{% block head %}
+    {{ parent() }}
+    <meta name="csrf-token" content="{{ csrf_token('share_wishlist') }}">
+{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/poopup.CSS') }}">
 {% endblock %}
 
 {% block title %}Mes listes de souhaits{% endblock %}
@@ -67,20 +71,22 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    
                                     <button class="btn btn-creer flex-fill text-center share-wishlist-btn" data-id="{{ wishlist.id }}">
                                         <i class="fas fa-share-alt"></i>
-                                    </button>
-                                </div>
+                                </button>
+                            </div>
 
-                                <!-- Share Popup -->
-                                <div id="share-popup-{{ wishlist.id }}" class="share-popup hidden">
-                                    <div class="share-popup-content">
-                                        <h2>Share Your Wishlist</h2>
-                                        <p>Use the link below to share your wishlist with friends and family.</p>
-                                        <input type="text" id="share-link-{{ wishlist.id }}" value="{{ url('app_wishlist_public', {'token': wishlist.publicToken}) }}" readonly>
-                                        <button class="btn btn-info copy-link-btn" data-id="{{ wishlist.id }}">Copy Link</button>
-                                        <button class="btn btn-secondary close-popup-btn" data-id="{{ wishlist.id }}">Close</button>
-                                    </div>
+                            <!-- Share Popup -->
+                            <div id="share-popup-{{ wishlist.id }}" class="share-popup hidden">
+                                <div class="share-popup-content">
+                                    <h2>Share Your Wishlist</h2>
+                                    <p>Use the link below to share your wishlist with friends and family.</p>
+                                    <input type="text" id="share-link-{{ wishlist.id }}" value="{{ url('app_wishlist_public', {'token': wishlist.publicToken}) }}" readonly>
+                                    <button class="btn btn-info copy-link-btn" data-id="{{ wishlist.id }}">Copy Link</button>
+                                    <button class="btn btn-secondary close-popup-btn" data-id="{{ wishlist.id }}">Close</button>
+                                </div>
+                            </div>
                                 </div>
                             </div>
                         </div>
@@ -91,41 +97,68 @@
     </div>
 </div>
 {% endblock %}
-
 {% block javascripts %}
 {{ parent() }}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle share button clicks
+        // Cacher TOUS les popups au chargement initial
+        const popups = document.querySelectorAll('.share-popup');
+        popups.forEach(popup => {
+            popup.classList.add('hidden');
+            popup.style.display = 'none'; // Ajout de cette ligne pour forcer le masquage
+        });
+
+        // Gestion des boutons de partage
         const shareButtons = document.querySelectorAll('.share-wishlist-btn');
         shareButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(event) {
+                event.stopPropagation(); // Empêcher la propagation du clic
+
+                // Masquer tous les autres popups d'abord
+                popups.forEach(p => {
+                    p.classList.add('hidden');
+                    p.style.display = 'none';
+                });
+
+                // Afficher uniquement le popup correspondant
                 const wishlistId = this.getAttribute('data-id');
                 const popup = document.getElementById('share-popup-' + wishlistId);
                 popup.classList.remove('hidden');
+                popup.style.display = 'block'; // Assurer que le popup s'affiche
             });
         });
 
-        // Handle popup close buttons
+        // Gestion des boutons de fermeture
         const closeButtons = document.querySelectorAll('.close-popup-btn');
         closeButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const wishlistId = this.getAttribute('data-id');
                 const popup = document.getElementById('share-popup-' + wishlistId);
                 popup.classList.add('hidden');
+                popup.style.display = 'none';
             });
         });
 
-        // Handle copy link buttons
+        // Fermeture des popups en cliquant à l'extérieur
+        document.addEventListener('click', function(event) {
+            const openPopups = document.querySelectorAll('.share-popup:not(.hidden)');
+            openPopups.forEach(popup => {
+                if (!popup.contains(event.target) && 
+                    !event.target.closest('.share-wishlist-btn')) {
+                    popup.classList.add('hidden');
+                    popup.style.display = 'none';
+                }
+            });
+        });
+
+        // Gestion de la copie du lien
         const copyButtons = document.querySelectorAll('.copy-link-btn');
         copyButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const wishlistId = this.getAttribute('data-id');
                 const linkInput = document.getElementById('share-link-' + wishlistId);
-
-                // Copy the link to clipboard
-                linkInput.select();
-                linkInput.setSelectionRange(0, 99999); // For mobile devices
+                
+                // Copier le lien
                 navigator.clipboard.writeText(linkInput.value)
                     .then(() => {
                         const originalText = this.textContent;

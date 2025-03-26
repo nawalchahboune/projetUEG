@@ -43,7 +43,12 @@ class AdminController extends AbstractController
     #[Route('/users', name: 'admin_users')]
     public function listUsers(UserRepository $userRepo): Response
     {
-        $users = $userRepo->findAll();
+        $currentUser = $this->getUser();
+        
+        $allUsers = $userRepo->findAll();
+        $users = array_filter($allUsers, function($user) use ($currentUser) {
+        return $user->getId() !== $currentUser->getId();
+         });
 
         return $this->render('admin/users.html.twig', [
             'users' => $users,

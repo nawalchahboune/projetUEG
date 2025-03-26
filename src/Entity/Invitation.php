@@ -22,15 +22,18 @@ class Invitation
     private ?User $sender = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'myInvitations')]
-    private Collection $receivers;
+    private ?User $receiver = null;
 
     private ?bool $accepted = null;
 
-    public function __construct(?Wishlist $wishlist, ?User $sender, Collection $receivers)
+    public function __construct(?Wishlist $wishlist, ?User $sender, ?User $receiver)
     {
+        if($receiver == null){
+            throw new \Exception("Receiver can't be null");
+        }
         $this->wishlist = $wishlist;
         $this->sender = $sender;
-        $this->receivers = $receivers;
+        $this->receiver = $receiver;
         $this->accepted = false;
     }
 
@@ -71,13 +74,26 @@ class Invitation
     public function setAccepted(?bool $accepted): static
     {
         $this->accepted = $accepted;
+        if ($accepted) {
+            $this->receiver->addCollaborativeWishlist($this->wishlist);
+        } 
 
         return $this;
     }
 
-    public function getReceivers(): Collection
+    public function getReceiver(): ?User
     {
-        return $this->receivers;
+        return $this->receiver;
+    }
+
+    public function setReceiver(?User $receiver): static
+    {
+        if($receiver == null){
+            throw new \Exception("Receiver can't be null");
+        }
+        $this->receiver = $receiver;
+
+        return $this;
     }
 
 }
