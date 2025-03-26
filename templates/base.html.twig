@@ -65,8 +65,11 @@
                                         <span class="badge bg-secondary ms-2">User</span>
                                     {% endif %}
                                 </span>
-                                <a href="{{ path('app_logout') }}" class="nav-link">Logout</a>
-                            {% else %}
+<form action="{{ path('app_logout') }}" method="post" class="logout-form">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+    <button type="submit" class="btn btn-link nav-link border-0 bg-transparent p-0">Logout</button>
+</form>
+                        {% else %}
                                 <div class="d-flex">
                                     <a href="{{ path('app_login') }}" class="btn btn-primary btn-sm me-3">Login</a>
                                     <a href="{{ path('app_signup') }}" class="btn btn-primary btn-sm">Sign Up</a>
