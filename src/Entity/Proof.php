@@ -17,17 +17,26 @@ class Proof
     private ?string $congratsMessage = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $proof = null;
+    private ?string $proofImagePath = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $buyer = null;
 
-    public function __construct(string $message = null, string $proof = null, User $buyer = null)
+    #[ORM\ManyToOne(targetEntity: Item::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Item $item = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    public function __construct(string $message = null, string $proofImagePath = null, User $buyer = null, Item $item = null)
     {
         $this->congratsMessage = $message;
-        $this->proof = $proof;
+        $this->proofImagePath = $proofImagePath;
         $this->buyer = $buyer;
+        $this->item = $item;
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -35,14 +44,14 @@ class Proof
         return $this->id;
     }
 
-    public function getProof(): ?string
+    public function getProofImagePath(): ?string
     {
-        return $this->proof;
+        return $this->proofImagePath;
     }
 
-    public function setProof(?string $proof): self
+    public function setProofImagePath(?string $proofImagePath): self
     {
-        $this->proof = $proof;
+        $this->proofImagePath = $proofImagePath;
         return $this;
     }
 
@@ -56,6 +65,7 @@ class Proof
         $this->congratsMessage = $message;
         return $this;
     }
+
     public function getBuyer(): ?User
     {
         return $this->buyer;
@@ -75,7 +85,28 @@ class Proof
     public function setCongratsMessage(string $congratsMessage): static
     {
         $this->congratsMessage = $congratsMessage;
+        return $this;
+    }
 
+    public function getItem(): ?Item
+    {
+        return $this->item;
+    }
+
+    public function setItem(?Item $item): self
+    {
+        $this->item = $item;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
         return $this;
     }
 }
