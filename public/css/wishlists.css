@@ -1,0 +1,51 @@
+.card {
+ margin-bottom: 20px; /* Ajoute un espace entre les cartes */
+ padding: 15px; /* Ajoute un espace interne dans la carte */
+}
+
+.btn-group {
+ gap: 10px; /* Ajoute un espace entre les boutons */
+}
+
+.card-title {
+ font-size: 1.2rem;
+ font-weight: bold;
+ color: #333;
+ margin-bottom: 10px; /* Ajoute un espace sous le titre */
+}
+
+.card-text {
+ font-size: 0.9rem;
+ color: #666;
+}
+.badge {
+ font-size: 0.8rem;
+ padding: 0.4em 0.6em;
+ border-radius: 12px;
+}
+
+.badge.bg-info {
+ background-color: #17a2b8;
+ color: #fff;
+}
+.btn {
+ transition: all 0.3s ease-in-out;
+}
+
+.btn:hover {
+ transform: translateY(-2px);
+ box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+ transform: translateY(-5px);
+ box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+h4 {
+ font-size: 1.5rem;
+ font-weight: bold;
+ margin-bottom: 1rem;
+ color: #333;
+ border-bottom: 2px solid #ddd;
+ padding-bottom: 10px;
+}

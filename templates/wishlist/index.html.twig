@@ -425,19 +425,6 @@
             {% for item in items %}
 
                 <div class="item-card">
-<<<<<<< HEAD
-=======
-                    <div class="item-actions">
-                        <a href="{{ path('edit_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="btn btn-icon btn-creer">
-                            <i class="fas fa-edit"></i>
-                        </a>
-                        
-                        <a href="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="btn btn-icon btn-supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
-                            <i class="fas fa-trash"></i>
-                        </a>
-                    </div>
-
->>>>>>> dbf01f546455d5eb0d6c7516733a89eae24c94b7
                     <div class="item-image-container">
                                 {% if aim is defined and aim == 'toBuy' and (not item.hasPurchased) %}
                                   <button class="btn btn-primary">Add Proof</button>    

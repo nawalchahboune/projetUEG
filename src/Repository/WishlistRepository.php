@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Wishlist;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -15,32 +16,6 @@ class WishlistRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Wishlist::class);
     }
-
-    //    /**
-    //     * @return Wishlist[] Returns an array of Wishlist objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('w')
-    //            ->andWhere('w.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('w.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Wishlist
-    //    {
-    //        return $this->createQueryBuilder('w')
-    //            ->andWhere('w.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-
     public function findTop3WishlistsByTotalValue(): array
 {
     return $this->createQueryBuilder('w')
@@ -50,6 +25,16 @@ class WishlistRepository extends ServiceEntityRepository
         ->groupBy('w')
         ->orderBy('totalValue', 'DESC')
         ->setMaxResults(3)
+        ->getQuery()
+        ->getResult();
+}
+
+public function findCollaboratorWishlists(User $user): array
+{
+    return $this->createQueryBuilder('w')
+        ->innerJoin('w.collaborators', 'c')
+        ->where('c = :user')
+        ->setParameter('user', $user)
         ->getQuery()
         ->getResult();
 }

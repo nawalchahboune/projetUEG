@@ -36,7 +36,7 @@ class WishlistController extends AbstractController
             'aim'=>'toBuy'
         ]);
     }
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted('ROLE_USER','ROLE_ADMIN')]
     #[Route('/{id}', name: 'app_wishlist_show')]
     public function show(Wishlist $wishlist): Response
     {
@@ -137,12 +137,12 @@ class WishlistController extends AbstractController
         
         return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlistId]);
     }*/
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted('ROLE_USER','ROLE_ADMIN')]
     #[Route('/{id}/deleteWishlist', name: 'app_wishlist_delete_wishlist', methods: ['POST'])]
     public function deleteWishlist(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
         // Check if user is the owner
-        if ($wishlist->getOwner() !== $this->getUser()) {
+        if ($wishlist->getOwner() !== $this->getUser() && $wishlist->getCollaborators()->contains($this->getUser())) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à supprimer cette liste');
         }
         
@@ -185,7 +185,7 @@ class WishlistController extends AbstractController
         
         return new RedirectResponse($url);
     }
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted('ROLE_USER','ROLE_ADMIN')]
     #[Route('/wishlist/{id}/share', name: 'wishlist_share')]
     public function share(Wishlist $wishlist): Response
     {

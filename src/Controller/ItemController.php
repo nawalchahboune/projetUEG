@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/wishlists/{idWishlist}/items')]
-#[IsGranted('ROLE_USER')]
+#[IsGranted('ROLE_USER,ROLE_ADMIN')]
 final class ItemController extends AbstractController
 {
     #[Route('/{idItem}/delete', name: 'delete_item')]

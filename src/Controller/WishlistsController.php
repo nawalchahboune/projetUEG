@@ -19,7 +19,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[Route('/myWishlists')]
-#[IsGranted('ROLE_USER')]
+#[IsGranted('ROLE_USER','ROLE_ADMIN')]
 class WishlistsController extends AbstractController
 {
     #[Route('/', name: 'app_wishlists_index')]
@@ -38,9 +38,11 @@ class WishlistsController extends AbstractController
         
         // Récupérer toutes les wishlists dont l'utilisateur est propriétaire
         $wishlists = $wishlistRepository->findBy(['owner' => $user]);
+        $wishlistsIamCollaborator = $wishlistRepository->findCollaboratorWishlists($user);
         
         return $this->render('wishlists/index.html.twig', [
             'wishlists' => $wishlists,
+            'wishlistsIamCollaborator' => $wishlistsIamCollaborator,
             'users'=>$users
             
         ]);
@@ -73,7 +75,7 @@ class WishlistsController extends AbstractController
     public function edit(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
         // Check if user is the owner
-        if ($wishlist->getOwner() !== $this->getUser()) {
+        if ($wishlist->getOwner() !== $this->getUser() && !$wishlist->getCollaborators()->contains($this->getUser())) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette liste');
         }
         

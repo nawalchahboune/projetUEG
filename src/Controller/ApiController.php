@@ -8,6 +8,7 @@ use App\Entity\Wishlist;
 use App\Repository\UserRepository;
 use App\Repository\WishlistRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +31,7 @@ class ApiController extends AbstractController
         }
         
         // Rechercher les utilisateurs dont le nom d'utilisateur commence par la requête
-        $users = $userRepository->searchByUsername($query);
+        $users = $userRepository->findByUsername($query);
         
         // Formater les données pour la réponse JSON
         $formattedUsers = [];
@@ -38,7 +39,7 @@ class ApiController extends AbstractController
             $formattedUsers[] = [
                 'id' => $user->getId(),
                 'username' => $user->getUsername(),
-                'avatarPath' => $user->getAvatarPath() ?? 'images/avatars/default.jpg'
+                'avatarPath' => 'images/avatars/default.png'
             ];
         }
         
@@ -63,7 +64,7 @@ class ApiController extends AbstractController
             $formattedUsers[] = [
                 'id' => $user->getId(),
                 'username' => $user->getUsername(),
-                'avatarPath' => $user->getAvatarPath() ?? 'images/avatars/default.jpg'
+                'avatarPath' =>  'images/avatars/default.png'
             ];
         }
         
@@ -73,69 +74,155 @@ class ApiController extends AbstractController
     /**
      * Partager une liste de souhaits avec un utilisateur
      */
-    #[Route('/wishlist/share', name: 'wishlist_share', methods: ['POST'])]
-    public function shareWishlist(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository, WishlistRepository $wishlistRepository): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        
-        if (!isset($data['wishlistId']) || !isset($data['username'])) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Données manquantes'
-            ], 400);
-        }
-        
-        // Vérifier que la liste existe
-        $wishlist = $wishlistRepository->find($data['wishlistId']);
-        if (!$wishlist) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Liste de souhaits introuvable'
-            ], 404);
-        }
-        
-        // Vérifier que l'utilisateur actuel est le propriétaire de la liste
-        if ($wishlist->getUser() !== $this->getUser()) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Vous n\'êtes pas autorisé à partager cette liste'
-            ], 403);
-        }
-        
-        // Trouver l'utilisateur avec qui partager
-        $targetUser = $userRepository->findOneBy(['username' => $data['username']]);
-        if (!$targetUser) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Utilisateur introuvable'
-            ], 404);
-        }
-        
-        // Vérifier que l'utilisateur ne partage pas avec lui-même
-        if ($targetUser === $this->getUser()) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Vous ne pouvez pas partager avec vous-même'
-            ], 400);
-        }
-        
-        // Ajouter l'utilisateur à la liste des personnes avec qui la liste est partagée
-        // Note: Cette partie dépend de votre implémentation exacte du partage de liste
-        // Supposons que vous avez une méthode addSharedUser dans l'entité Wishlist
-        try {
-            // Exemple - adaptez selon votre modèle de données
-            $wishlist->addSharedUser($targetUser);
-            $entityManager->flush();
-            
-            return $this->json([
-                'success' => true,
-                'message' => 'Liste partagée avec succès'
-            ]);
-        } catch (\Exception $e) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Erreur lors du partage: ' . $e->getMessage()
-            ], 500);
-        }
+#[Route('/wishlist/add-collaborator', name: 'wishlist_add_collaborator', methods: ['POST'])]
+public function addCollaborator(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    UserRepository $userRepository,
+    WishlistRepository $wishlistRepository
+): JsonResponse {
+    $data = json_decode($request->getContent(), true);
+
+    // Vérifier que les paramètres nécessaires sont présents
+    if (!isset($data['wishlistId']) || !isset($data['username'])) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Paramètres incomplets'
+        ], 400);
     }
+
+    $wishlistId = $data['wishlistId'];
+    $username = $data['username'];
+
+    // Récupérer la wishlist
+    $wishlist = $wishlistRepository->find($wishlistId);
+    if (!$wishlist) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Liste de souhaits introuvable'
+        ], 404);
+    }
+
+    // Vérifier que l'utilisateur actuel est le propriétaire de la wishlist
+    $currentUser = $this->getUser();
+    if ($wishlist->getOwner() !== $currentUser) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Vous n\'êtes pas autorisé à modifier cette liste'
+        ], 403);
+    }
+
+    // Récupérer l'utilisateur par son nom d'utilisateur
+    $targetUser = $userRepository->findOneBy(['username' => $username]);
+    if (!$targetUser) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Aucun utilisateur trouvé avec ce nom d\'utilisateur'
+        ], 404);
+    }
+
+    // Vérifier si l'utilisateur est déjà collaborateur
+    if ($wishlist->getCollaborators()->contains($targetUser)) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Cet utilisateur est déjà collaborateur'
+        ], 400);
+    }
+
+    // Ajouter l'utilisateur comme collaborateur
+    $wishlist->addCollaborator($targetUser);
+    $entityManager->persist($wishlist);
+    $entityManager->flush();
+
+    return $this->json([
+        'success' => true,
+        'message' => 'Collaborateur ajouté avec succès',
+        'username' => $targetUser->getUsername()
+    ]);
+}
+
+     #[Route('/wishlist/share', name: 'wishlist_share', methods: ['POST'])]
+     public function shareWishlist(
+         Request $request, 
+         EntityManagerInterface $entityManager, 
+         UserRepository $userRepository, 
+         WishlistRepository $wishlistRepository
+     ): JsonResponse {
+         // Récupérer les données JSON
+         $data = json_decode($request->getContent(), true);
+     
+         // Débogage : afficher les données reçues
+         file_put_contents('share_wishlist_debug.log', print_r($data, true));
+     
+         // Vérifier que tous les paramètres sont présents
+         if (!isset($data['wishlistId']) || !isset($data['username'])) {
+             return $this->json([
+                 'success' => false,
+                 'message' => 'Paramètres incomplets'
+             ], 400);
+         }
+     
+         $wishlistId = $data['wishlistId'];
+         $username = $data['username'];
+     
+         // Vérifier que l'utilisateur est connecté
+         $currentUser = $this->getUser();
+         if (!$currentUser) {
+             return $this->json([
+                 'success' => false,
+                 'message' => 'Vous devez être connecté'
+             ], 401);
+         }
+     
+         // Récupérer la wishlist
+         $wishlist = $wishlistRepository->find($wishlistId);
+         if (!$wishlist) {
+             return $this->json([
+                 'success' => false,
+                 'message' => 'Liste de souhaits introuvable'
+             ], 404);
+         }
+     
+         // Vérifier que l'utilisateur est le propriétaire
+         if ($wishlist->getOwner() !== $currentUser) {
+             return $this->json([
+                 'success' => false,
+                 'message' => 'Vous n\'êtes pas autorisé à partager cette liste'
+             ], 403);
+         }
+     
+         // Chercher l'utilisateur exactement par son username
+         $targetUser = $userRepository->findOneBy(['username' => $username]);
+         
+         // Vérifier si l'utilisateur existe
+         if (!$targetUser) {
+             return $this->json([
+                 'success' => false,
+                 'message' => 'Aucun utilisateur trouvé avec ce nom d\'utilisateur'
+             ], 404);
+         }
+     
+         // Vérifier si l'utilisateur n'est pas déjà collaborateur
+         if ($wishlist->getCollaborators()->contains($targetUser)) {
+             return $this->json([
+                 'success' => false,
+                 'message' => 'Cet utilisateur est déjà collaborateur'
+             ], 400);
+         }
+     
+         // Ajouter le collaborateur
+         $wishlist->addCollaborator($targetUser);
+         $targetUser->addCollaborativeWishlist($wishlist);
+         
+         // Enregistrer les modifications
+         $entityManager->persist($wishlist);
+         $entityManager->persist($targetUser);
+         $entityManager->flush();
+     
+         return $this->json([
+             'success' => true,
+             'message' => 'Liste partagée avec succès',
+             'username' => $targetUser->getUsername()
+         ]);
+     }    
 }
