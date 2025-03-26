@@ -19,7 +19,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[Route('/myWishlists')]
-#[IsGranted('ROLE_USER','ROLE_ADMIN')]
+#[IsGranted('ROLE_USER')]
 class WishlistsController extends AbstractController
 {
     #[Route('/', name: 'app_wishlists_index')]
