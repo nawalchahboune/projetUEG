@@ -67,8 +67,15 @@
                                             </button>
                                         </form>
                                         <button class="btn btn-creer flex-fill text-center share-wishlist-btn" data-id="{{ wishlist.id }}">
-                                            <i class="fas fa-share-alt"></i>
-                                        </button>
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                                <div id="share-popup-{{ wishlist.id }}" class="share-popup hidden">
+                                    <div class="share-popup-content">
+                                        <h2>Share Your Wishlist</h2>
+                                        <p>Use the link below to share your wishlist with friends and family.</p>
+                                        <input type="text" id="share-link-{{ wishlist.id }}" value="{{ url('app_wishlist_public', {'token': wishlist.publicToken}) }}" readonly>
+                                        <button class="btn btn-info copy-link-btn" data-id="{{ wishlist.id }}">Copy Link</button>
+                                        <button class="btn btn-secondary close-popup-btn" data-id="{{ wishlist.id }}">Close</button>
                                     </div>
                                 </div>
 
