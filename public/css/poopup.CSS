@@ -1,49 +1,69 @@
+/* Styles de base du popup */
 .share-popup {
  position: fixed;
- top: 0;
- left: 0;
- width: 100%;
- height: 100%;
- background-color: rgba(0, 0, 0, 0.5);
+ top: 50%; /* Centrage vertical */
+ left: 50%; /* Centrage horizontal */
+ transform: translate(-50%, -50%); /* Ajuste pour centrer parfaitement */
+ background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
  display: flex;
  justify-content: center;
  align-items: center;
  z-index: 1000;
+ width: 100%; /* Optionnel : peut être ajusté */
+ height: 100%; /* Optionnel : peut être ajusté */
 }
 
 .share-popup.hidden {
- display: none;
+ display: none !important; /* Masque le popup */
 }
 
 .share-popup-content {
  background-color: white;
- padding: 2rem;
- border-radius: 8px;
- text-align: center;
- box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
- max-width: 400px;
+ padding: 25px;
+ border-radius: 12px;
  width: 90%;
+ max-width: 550px;
+ box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+ text-align: center; /* Centrer le contenu */
 }
 
 .share-popup-content h2 {
- margin-bottom: 1rem;
+ margin-top: 0;
+ margin-bottom: 20px;
  font-size: 1.5rem;
+ font-weight: 600;
 }
 
 .share-popup-content p {
- margin-bottom: 1rem;
- color: #666;
+ margin-bottom: 15px;
+ color: #555;
 }
 
-.share-popup-content input {
- width: 100%;
- padding: 0.5rem;
- margin-bottom: 1rem;
- border: 1px solid #ddd;
- border-radius: 4px;
- font-size: 1rem;
+/* Bouton Fermer */
+.popup-footer {
+ display: flex;
+ justify-content: center;
+ margin-top: 25px;
 }
 
-.share-popup-content button {
- margin: 0.5rem;
+.close-popup-btn {
+ padding: 10px 20px;
+ background-color: #f0f0f0;
+ color: #333;
+ border: none;
+ border-radius: 8px;
+ cursor: pointer;
+ transition: background-color 0.2s;
+}
+
+.close-popup-btn:hover {
+ background-color: #e0e0e0;
+}
+
+/* Styles responsive */
+@media (max-width: 576px) {
+ .share-popup-content {
+     width: 95%;
+     padding: 20px;
+ }
 }
