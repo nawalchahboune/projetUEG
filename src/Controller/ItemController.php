@@ -19,10 +19,13 @@ final class ItemController extends AbstractController
     #[Route('/{idItem}/delete', name: 'delete_item')]
     public function delete(int $idWishlist, int $idItem, EntityManagerInterface $entityManager): Response
     {
-        $wishlist=$entityManager->getRepository(Wishlist::class)->find($idWishlist);
-        $item=$entityManager->getRepository(Item::class)->find($idItem);
-        $entityManager->remove($item);
-        $entityManager->flush();    
+        $wishlist = $entityManager->getRepository(Wishlist::class)->find($idWishlist);
+        if ($wishlist->getOwner() == $this->getUser() || $wishlist->getCollaborators()->contains($this->getUser())) {
+            $item=$entityManager->getRepository(Item::class)->find($idItem);
+            $entityManager->remove($item);
+            $entityManager->flush();
+        }
+         
         return $this->render('wishlist/index.html.twig', [
             'wishlist' => $wishlist,
             'items' => $wishlist->getItems(),
@@ -39,10 +42,10 @@ final class ItemController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $item->setWishlist($wishlist);
             $item->setHasPurchased(false);
-            
+        if ($wishlist->getOwner() == $this->getUser() || $wishlist->getCollaborators()->contains($this->getUser())) {
             $entityManager->persist($item);
-
             $entityManager->flush();
+        }
             
                 return $this->render('wishlist/index.html.twig', [
                     'wishlist' => $wishlist,
@@ -68,9 +71,11 @@ final class ItemController extends AbstractController
         
         $form = $this->createForm(ItemFormType::class, $item);
         $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+                if ($form->isSubmitted() && $form->isValid()) {
+                    if ($wishlist->getOwner() == $this->getUser() || $wishlist->getCollaborators()->contains($this->getUser())) {
+                        $entityManager->persist($item);
+                        $entityManager->flush();
+                    }
             
             return $this->redirectToRoute('app_wishlist_show', [
                 'id' => $idWishlist

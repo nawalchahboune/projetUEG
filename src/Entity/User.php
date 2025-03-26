@@ -65,7 +65,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     private Collection $myInvitations;
 
     #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: Notification::class, orphanRemoval: true)]
-    private Collection $myNotifications;
+    private Collection $receivedNotifications;
 
 
 
@@ -74,6 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
         $this->ownedWishlists = new ArrayCollection();
         $this->collaborativeWishlists = new ArrayCollection();
         $this->myInvitations = new ArrayCollection();
+        $this->receivedNotifications = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,6 +174,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setType(string $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getReceivedNotifications(): Collection
+    {
+        return $this->receivedNotifications;
+    }
+
+    public function addReceivedNotification(Notification $notification): self
+    {
+        if (!$this->receivedNotifications->contains($notification)) {
+            $this->receivedNotifications->add($notification);
+            $notification->setRecipient($this);
+        }
+
+        return $this;
+    }
+
+    public function setReceivedNotifications(Collection $notifications): self
+    {
+        $this->receivedNotifications = $notifications;
 
         return $this;
     }

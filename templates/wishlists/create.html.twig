@@ -37,6 +37,7 @@
                         <small class="form-text text-muted">Sélectionnez les utilisateurs avec qui vous souhaitez partager cette liste</small>
                     </div>
                     {% endif %}
+
                     <!-- Boutons -->
                     <div class="d-grid gap-3 d-md-flex justify-content-md-between mt-4">
                         <a href="{{ path('app_wishlists_index') }}" class="btn btn-outline-dark px-4 py-2 shadow-sm mb-3">
@@ -46,6 +47,7 @@
                             <i class="fas fa-save me-2"></i> Créer la liste
                         </button>
                     </div>
+
                     {{ form_end(form) }}
                 </div>
             </div>
@@ -58,7 +60,9 @@
 {{ parent() }}
 {% if form.collaborators is defined %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() 
+    document.addEventListener('DOMContentLoaded', function() {
+        // Vous pouvez ajouter ici du code JavaScript pour améliorer le sélecteur multiple
+        // Par exemple, intégrer Select2 ou un autre plugin pour un meilleur UX
     });
 </script>
 {% endif %}

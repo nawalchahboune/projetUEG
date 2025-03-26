@@ -427,8 +427,13 @@
                 <div class="item-card">
                     <div class="item-image-container">
                                 {% if aim is defined and aim == 'toBuy' and (not item.hasPurchased) %}
-                                  <button class="btn btn-primary">Add Proof</button>    
-                                {% endif %}
+                                <button 
+                                class="btn btn-primary" 
+                                onclick="window.location.href='{{ path('gift_proof_form', {'id': item.id}) }}'">
+                                Add Prooft
+                            </button>                                
+                            
+                            {% endif %}
                         {% if item.price %}
                             <div class="item-price">{{ item.price|number_format(2, ',', ' ') }} €</div>
                         {% endif %}
