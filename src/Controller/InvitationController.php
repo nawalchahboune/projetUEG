@@ -18,8 +18,18 @@ class InvitationController extends AbstractController
      */
     public function index(InvitationRepository $invitationRepository): Response
     {
+        // Récupérer les invitations dont l'utilisateur connecté est le récepteur
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
+
+        $invitations = $invitationRepository->findBy([
+            'receiver' => $user
+        ]);
+
         return $this->render('invitation/index.html.twig', [
-            'invitations' => $invitationRepository->findAll(),
+            'invitations' => $invitations,
         ]);
     }
 
@@ -50,6 +60,12 @@ class InvitationController extends AbstractController
      */
     public function show(Invitation $invitation): Response
     {
+        // Optionnel : vérifier que l'utilisateur connecté est bien le destinataire de l'invitation
+        $user = $this->getUser();
+        if ($invitation->getReceiver() !== $user) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette invitation.');
+        }
+
         return $this->render('invitation/show.html.twig', [
             'invitation' => $invitation,
         ]);
@@ -60,6 +76,12 @@ class InvitationController extends AbstractController
      */
     public function edit(Request $request, Invitation $invitation, EntityManagerInterface $entityManager): Response
     {
+        // Optionnel : vérifier que l'utilisateur connecté est bien le destinataire de l'invitation
+        $user = $this->getUser();
+        if ($invitation->getReceiver() !== $user) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette invitation.');
+        }
+
         $form = $this->createForm(InvitationType::class, $invitation);
         $form->handleRequest($request);
 
@@ -80,6 +102,12 @@ class InvitationController extends AbstractController
      */
     public function delete(Request $request, Invitation $invitation, EntityManagerInterface $entityManager): Response
     {
+        // Vérification CSRF et éventuellement vérification que l'utilisateur connecté est bien le destinataire
+        $user = $this->getUser();
+        if ($invitation->getReceiver() !== $user) {
+            throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette invitation.');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$invitation->getId(), $request->request->get('_token'))) {
             $entityManager->remove($invitation);
             $entityManager->flush();
@@ -87,4 +115,33 @@ class InvitationController extends AbstractController
 
         return $this->redirectToRoute('invitation_index');
     }
+
+    #[Route('/invitations/{id}/accept', name: 'invitation_accept', methods: ['POST'])]
+    public function accept(Invitation $invitation, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        
+        // Vérifier que l'utilisateur connecté est bien le destinataire de l'invitation
+        if ($invitation->getReceiver() !== $user) {
+            throw $this->createAccessDeniedException("Vous n'avez pas accès à cette invitation.");
+        }
+        
+        // Si l'invitation a déjà été acceptée, on affiche un message d'information
+        if ($invitation->isAccepted()) {
+            $this->addFlash('info', 'Cette invitation a déjà été acceptée.');
+            return $this->redirectToRoute('app_wishlists_index');
+        }
+        
+        // Accepter l'invitation : cette méthode dans l'entité ajoutera la wishlist aux listes collaboratives de l'utilisateur
+        $invitation->setAccepted(true);
+        
+        $entityManager->flush();
+        
+        $this->addFlash('success', 'Invitation acceptée. La wishlist a été ajoutée à vos listes partagées.');
+        
+        return $this->redirectToRoute('app_wishlists_index');
+    }
+
+    
+
 }

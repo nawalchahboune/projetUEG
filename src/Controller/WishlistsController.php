@@ -8,6 +8,7 @@ use App\ItemForm\WishlistType;
 use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Repository\WishlistRepository;
+use App\Repository\InvitationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,8 +25,11 @@ use Symfony\Component\Form\FormError;
 class WishlistsController extends AbstractController
 {
     #[Route('/', name: 'app_wishlists_index')]
-    public function index(WishlistRepository $wishlistRepository, UserRepository $userRepository): Response
-    {
+    public function index(
+        WishlistRepository $wishlistRepository, 
+        UserRepository $userRepository,
+        InvitationRepository $invitationRepository
+    ): Response {
         // Récupérer l'utilisateur connecté
         $user = $this->getUser();
         
@@ -33,16 +37,21 @@ class WishlistsController extends AbstractController
         if (!$user) {
             return $this->render('security/login.html.twig');
         }
+        
         $users = $userRepository->findAll();
         
         // Récupérer toutes les wishlists dont l'utilisateur est propriétaire
         $wishlists = $wishlistRepository->findBy(['owner' => $user]);
         $wishlistsIamCollaborator = $wishlistRepository->findCollaboratorWishlists($user);
         
+        // Récupérer les invitations où l'utilisateur est destinataire
+        $invitations = $invitationRepository->findBy(['receiver' => $user]);
+
         return $this->render('wishlists/index.html.twig', [
             'wishlists' => $wishlists,
             'wishlistsIamCollaborator' => $wishlistsIamCollaborator,
-            'users' => $users
+            'users' => $users,
+            'invitations' => $invitations,
         ]);
     }
 
@@ -88,7 +97,6 @@ class WishlistsController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
 
     #[Route('/{id}/edit', name: 'app_wishlists_edit')]
     public function edit(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
@@ -138,7 +146,6 @@ class WishlistsController extends AbstractController
             'wishlist' => $wishlist,
         ]);
     }
-
 
     #[Route('/{id}/delete', name: 'app_wishlists_delete', methods: ['POST'])]
     public function delete(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
@@ -235,13 +242,12 @@ class WishlistsController extends AbstractController
 
         if (count($invalidUsernames) > 0) {
             $this->addFlash('error', 'Les noms d\'utilisateur suivants n\'existent pas : ' . implode(', ', $invalidUsernames));
-            return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+            return $this->redirectToRoute('app_wishlists_show', ['id' => $wishlist->getId()]);
         }
 
         $entityManager->flush();
 
         $this->addFlash('success', 'La liste de souhaits a été partagée avec succès.');
-        return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+        return $this->redirectToRoute('app_wishlists_show', ['id' => $wishlist->getId()]);
     }
-
 }
