@@ -29,14 +29,14 @@
                     </div>
 
                     <!-- Collaborateurs -->
-                    {% if form.collaborators is defined %}
-                    <div class="mb-4">
+                    {# {% if form.collaborators is defined %}
+                    {# <div class="mb-4">
                         {{ form_label(form.collaborators, 'Partagez avec (optionnel)', {'label_attr': {'class': 'fw-bold text-dark'}}) }}
                         {{ form_widget(form.collaborators, {'attr': {'class': 'form-select p-3', 'multiple': 'multiple', 'style': 'border-radius: 8px; border: 2px solid #D1D1D1; transition: border 0.3s ease-in-out;'}}) }}
                         {{ form_errors(form.collaborators) }}
                         <small class="form-text text-muted">Sélectionnez les utilisateurs avec qui vous souhaitez partager cette liste</small>
-                    </div>
-                    {% endif %}
+                    </div> #}
+                    {# {% endif %} #} 
 
                     <!-- Boutons -->
                     <div class="d-grid gap-3 d-md-flex justify-content-md-between mt-4">
@@ -56,14 +56,4 @@
 </div>
 {% endblock %}
 
-{% block javascripts %}
-{{ parent() }}
-{% if form.collaborators is defined %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Vous pouvez ajouter ici du code JavaScript pour améliorer le sélecteur multiple
-        // Par exemple, intégrer Select2 ou un autre plugin pour un meilleur UX
-    });
-</script>
-{% endif %}
-{% endblock %}
+

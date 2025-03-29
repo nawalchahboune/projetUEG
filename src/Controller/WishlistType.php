@@ -32,16 +32,16 @@ class WishlistType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false,
             ])
-            ->add('collaborators', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => function (User $user) {
-                    return $user->getFirstName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
-                },
-                'multiple' => true,
-                'expanded' => false,
-                'required' => false,
-                'label' => 'Collaborateurs (optionnel)',
-            ])
+            // ->add('collaborators', EntityType::class, [
+            //     'class' => User::class,
+            //     'choice_label' => function (User $user) {
+            //         return $user->getFirstName() . ' ' . $user->getLastName() . ' (' . $user->getEmail() . ')';
+            //     },
+            //     'multiple' => true,
+            //     'expanded' => false,
+            //     'required' => false,
+            //     'label' => 'Collaborateurs (optionnel)',
+            // ])
             ->add('save', SubmitType::class, [
                 'label' => 'Enregistrer',
                 'attr' => ['class' => 'btn btn-primary'],
