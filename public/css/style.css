@@ -64,6 +64,23 @@
     background-color: #f5f5f5;
 }
 
+/* Style for expired wishlists */
+.card-expired {
+    opacity: 0.8;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.card-expired .card-title {
+    color: #6c757d;
+}
+
+.card-expired .badge {
+    margin-left: 10px;
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
 .text-primary {
     color: var(--primary-color) !important;
 }

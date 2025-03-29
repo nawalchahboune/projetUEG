@@ -82,6 +82,15 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
         $this->publicToken = Uuid::v4()->toRfc4122();
         return $this;
     }
+
+    public function isExpired(): bool
+    {
+        if ($this->deadline === null) {
+            return false;
+        }
+        
+        return $this->deadline < new \DateTime();
+    }
 // composer require symfony/uid
     public function __construct(?string $name=null, ?DateTimeInterface $deadline=null )
     {
