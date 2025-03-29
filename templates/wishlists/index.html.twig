@@ -183,19 +183,28 @@
                                 </p>
                                 <p class="card-text">
                                     <strong>Statut :</strong> 
-                                    {% if invitation.accepted %}
-                                        Acceptée
-                                    {% else %}
+                                    {% if invitation.accepted is same as(null) %}
                                         En attente
+                                    {% elseif invitation.accepted == true %}
+                                        Acceptée
+                                    {% elseif invitation.accepted == false %}
+                                        Refusée
                                     {% endif %}
                                 </p>
-                                <a href="{{ path('app_invitation_show', {'id': invitation.id}) }}" class="btn btn-primary mb-2">Voir l'invitation</a>
-                                {% if not invitation.accepted %}
-                                    <form action="{{ path('invitation_accept', {'id': invitation.id}) }}" method="post">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('accept' ~ invitation.id) }}">
-                                        <button type="submit" class="btn btn-success">Accepter l'invitation</button>
-                                    </form>
+                                <a href="{{ path('invitation_show', {'id': invitation.id}) }}" class="btn btn-primary mb-2">Voir l'invitation</a>
+                                {% if invitation.accepted is same as(null) %}
+                                    <div class="action-buttons" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                                        <form action="{{ path('invitation_accept', {'id': invitation.id}) }}" method="post" style="margin: 0;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('accept' ~ invitation.id) }}">
+                                            <button type="submit" class="btn btn-success">Accepter l'invitation</button>
+                                        </form>
+                                        <form action="{{ path('invitation_reject', {'id': invitation.id}) }}" method="post" style="margin: 0;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ invitation.id) }}">
+                                            <button type="submit" class="btn btn-danger">Refuser l'invitation</button>
+                                        </form>
+                                    </div>
                                 {% endif %}
+
                             </div>
                         </div>
                     </div>

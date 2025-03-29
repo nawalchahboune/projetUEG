@@ -79,9 +79,14 @@ class WishlistsController extends AbstractController
                         if (!empty($username)) {
                             $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
                             if ($user) {
-                                $wishlist->addCollaborator($user);
+                                // Ancien code pour ajouter directement le collaborateur :
+                                // $wishlist->addCollaborator($user);
+                                
+                                // Nouveau code : envoyer une invitation
+                                $invitation = new Invitation($wishlist, $this->getUser(), $user);
+                                $entityManager->persist($invitation);
                             } else {
-                                // Optional: add flash message or log error if user not found
+                                // Optionnel : ajouter un flash ou logger si l'utilisateur n'est pas trouvé
                                 $this->addFlash('error', "L'utilisateur '{$username}' n'a pas été trouvé.");
                             }
                         }
@@ -117,6 +122,9 @@ class WishlistsController extends AbstractController
             $collaboratorsInput = $request->request->get('collaborators_hidden', '');
             if (!empty($collaboratorsInput)) {
                 $usernames = array_filter(array_map('trim', explode(',', $collaboratorsInput)));
+                
+                // Ancien code pour mettre à jour les collaborateurs directement :
+                /*
                 // Remove collaborators that are no longer in the hidden field
                 foreach ($wishlist->getCollaborators() as $collaborator) {
                     if (!in_array($collaborator->getUsername(), $usernames)) {
@@ -130,11 +138,32 @@ class WishlistsController extends AbstractController
                         $wishlist->addCollaborator($user);
                     }
                 }
+                */
+                
+                // Nouveau code : envoyer une invitation pour chaque username non déjà collaborateur
+                foreach ($usernames as $username) {
+                    $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+                    if ($user) {
+                        // On peut vérifier ici si une invitation existe déjà ou si l'utilisateur est déjà collaborateur
+                        if (
+                            !$wishlist->getCollaborators()->contains($user)
+                            // Vous pouvez ajouter ici une vérification d'existence d'invitation non acceptée si nécessaire
+                        ) {
+                            $invitation = new Invitation($wishlist, $this->getUser(), $user);
+                            $entityManager->persist($invitation);
+                        }
+                    } else {
+                        $this->addFlash('error', "L'utilisateur '{$username}' n'a pas été trouvé.");
+                    }
+                }
             } else {
-                // If the hidden field is empty, you might want to remove all collaborators:
+                // Si le champ caché est vide, vous pouvez décider de ne rien faire ou gérer la suppression d'invitations/collaborateurs
+                // Ancien code pour supprimer tous les collaborateurs :
+                /*
                 foreach ($wishlist->getCollaborators() as $collaborator) {
                     $wishlist->removeCollaborator($collaborator);
                 }
+                */
             }
 
             $entityManager->flush();
@@ -214,7 +243,7 @@ class WishlistsController extends AbstractController
         // Vérifier que l'utilisateur connecté est bien le propriétaire
         if ($wishlist->getOwner() !== $this->getUser()) {
             $this->addFlash('error', 'Vous n\'avez pas l\'autorisation de partager cette liste.');
-            return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+            return $this->redirectToRoute('app_wishlists_show', ['id' => $wishlist->getId()]);
         }
 
         // Récupérer les noms d'utilisateur soumis

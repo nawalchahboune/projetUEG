@@ -13,12 +13,10 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class InvitationController extends AbstractController
 {
-    /**
-     * @Route("/invitations", name="invitation_index", methods={"GET"})
-     */
+    #[Route("/invitations", name: "invitation_list", methods: ["GET"])]
     public function index(InvitationRepository $invitationRepository): Response
     {
-        // Récupérer les invitations dont l'utilisateur connecté est le récepteur
+        // Retrieve invitations where the current user is the receiver
         $user = $this->getUser();
         if (!$user) {
             throw $this->createAccessDeniedException('Accès refusé.');
@@ -28,14 +26,12 @@ class InvitationController extends AbstractController
             'receiver' => $user
         ]);
 
-        return $this->render('invitation/index.html.twig', [
+        return $this->render('invitation/listshow.html.twig', [
             'invitations' => $invitations,
         ]);
     }
 
-    /**
-     * @Route("/invitations/new", name="invitation_new", methods={"GET", "POST"})
-     */
+    #[Route("/invitations/new", name: "invitation_new", methods: ["GET", "POST"])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $invitation = new Invitation();
@@ -46,7 +42,7 @@ class InvitationController extends AbstractController
             $entityManager->persist($invitation);
             $entityManager->flush();
 
-            return $this->redirectToRoute('invitation_index');
+            return $this->redirectToRoute('invitation_list');
         }
 
         return $this->render('invitation/new.html.twig', [
@@ -55,12 +51,10 @@ class InvitationController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/invitations/{id}", name="invitation_show", methods={"GET"})
-     */
+    #[Route("/invitations/{id}", name: "invitation_show", methods: ["GET"])]
     public function show(Invitation $invitation): Response
     {
-        // Optionnel : vérifier que l'utilisateur connecté est bien le destinataire de l'invitation
+        // Optionally verify that the current user is the receiver of the invitation
         $user = $this->getUser();
         if ($invitation->getReceiver() !== $user) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette invitation.');
@@ -71,12 +65,10 @@ class InvitationController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/invitations/{id}/edit", name="invitation_edit", methods={"GET", "POST"})
-     */
+    #[Route("/invitations/{id}/edit", name: "invitation_edit", methods: ["GET", "POST"])]
     public function edit(Request $request, Invitation $invitation, EntityManagerInterface $entityManager): Response
     {
-        // Optionnel : vérifier que l'utilisateur connecté est bien le destinataire de l'invitation
+        // Optionally verify that the current user is the receiver of the invitation
         $user = $this->getUser();
         if ($invitation->getReceiver() !== $user) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette invitation.');
@@ -88,7 +80,7 @@ class InvitationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('invitation_index');
+            return $this->redirectToRoute('invitation_list');
         }
 
         return $this->render('invitation/edit.html.twig', [
@@ -97,12 +89,10 @@ class InvitationController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/invitations/{id}", name="invitation_delete", methods={"POST"})
-     */
+    #[Route("/invitations/{id}", name: "invitation_delete", methods: ["POST"])]
     public function delete(Request $request, Invitation $invitation, EntityManagerInterface $entityManager): Response
     {
-        // Vérification CSRF et éventuellement vérification que l'utilisateur connecté est bien le destinataire
+        // CSRF verification and optionally ensure that the current user is the receiver
         $user = $this->getUser();
         if ($invitation->getReceiver() !== $user) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette invitation.');
@@ -113,35 +103,57 @@ class InvitationController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('invitation_index');
+        return $this->redirectToRoute('invitation_list');
     }
 
-    #[Route('/invitations/{id}/accept', name: 'invitation_accept', methods: ['POST'])]
+    #[Route("/invitations/{id}/accept", name: "invitation_accept", methods: ["POST"])]
     public function accept(Invitation $invitation, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
-        
-        // Vérifier que l'utilisateur connecté est bien le destinataire de l'invitation
+
+        // Verify that the current user is the receiver of the invitation
         if ($invitation->getReceiver() !== $user) {
             throw $this->createAccessDeniedException("Vous n'avez pas accès à cette invitation.");
         }
-        
-        // Si l'invitation a déjà été acceptée, on affiche un message d'information
+
+        // If the invitation has already been accepted, show an info message
         if ($invitation->isAccepted()) {
             $this->addFlash('info', 'Cette invitation a déjà été acceptée.');
             return $this->redirectToRoute('app_wishlists_index');
         }
-        
-        // Accepter l'invitation : cette méthode dans l'entité ajoutera la wishlist aux listes collaboratives de l'utilisateur
+
+        // Accept the invitation. The entity method will add the wishlist to the user's collaborative lists.
         $invitation->setAccepted(true);
-        
+
         $entityManager->flush();
-        
+
         $this->addFlash('success', 'Invitation acceptée. La wishlist a été ajoutée à vos listes partagées.');
-        
+
         return $this->redirectToRoute('app_wishlists_index');
     }
 
-    
+    #[Route("/invitations/{id}/reject", name: "invitation_reject", methods: ["POST"])]
+    public function reject(Invitation $invitation, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
 
+        // Verify that the current user is the receiver of the invitation
+        if ($invitation->getReceiver() !== $user) {
+            throw $this->createAccessDeniedException("Vous n'avez pas accès à cette invitation.");
+        }
+
+        // If the invitation is already rejected or accepted, we might show a message
+        if ($invitation->isAccepted() === false) {
+            $this->addFlash('info', 'Cette invitation a déjà été rejetée.');
+            return $this->redirectToRoute('invitation_list');
+        }
+
+        // Set invitation as rejected (you may choose to store false, or handle rejection in your own way)
+        $invitation->setAccepted(false);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Invitation rejetée.');
+
+        return $this->redirectToRoute('invitation_list');
+    }
 }

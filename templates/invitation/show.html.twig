@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .invitation-card {
+            background-color: #e8f4fa; /* soft light blue */
+            border: 1px solid rgb(50, 139, 233); /* Atlantic blue */
+            border-radius: 8px;
+            padding: 20px;
+            margin: 40px auto;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .invitation-title {
+            color: rgb(126, 222, 134);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .invitation-info p {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin: 10px 0;
+        }
+        .invitation-info strong {
+            color: rgb(0, 0, 0);
+        }
+        .status-pending {
+            color: #f0ad4e;
+            font-weight: bold;
+        }
+        .status-accepted {
+            color: #5cb85c;
+            font-weight: bold;
+        }
+        .status-rejected {
+            color: #d9534f;
+            font-weight: bold;
+        }
+        .btn-action {
+            display: inline-block;
+            background-color: rgb(126, 222, 134);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 1rem;
+            margin: 10px 5px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-action:hover {
+            background-color: #0056b3;
+        }
+        .btn-back {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 1rem;
+            margin: 10px 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+        .action-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .navigation-buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}Invitation Details{% endblock %}
+
+{% block body %}
+    <div class="invitation-card">
+        <h1 class="invitation-title">Invitation Details</h1>
+        <div class="invitation-info">
+            <p><strong>Wishlist:</strong> {{ invitation.wishlist ? invitation.wishlist.name : 'N/A' }}</p>
+            <p><strong>Sender:</strong> {{ invitation.sender ? invitation.sender.username : 'N/A' }}</p>
+            <p><strong>Receiver:</strong> {{ invitation.receiver ? invitation.receiver.username : 'N/A' }}</p>
+            <p>
+            <strong>Status:</strong>
+            {% if invitation.accepted is same as(null) %}
+                <span class="status-pending">Pending</span>
+            {% elseif invitation.accepted == true %}
+                <span class="status-accepted">Accepted</span>
+            {% elseif invitation.accepted == false %}
+                <span class="status-rejected">Rejected</span>
+            {% endif %}
+            </p>
+        </div>
+        {% if invitation.accepted is null %}
+            <div class="action-buttons">
+                <form action="{{ path('invitation_accept', {'id': invitation.id}) }}" method="post" style="display:inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('accept' ~ invitation.id) }}">
+                    <button type="submit" class="btn-action">Accept</button>
+                </form>
+                <form action="{{ path('invitation_reject', {'id': invitation.id}) }}" method="post" style="display:inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ invitation.id) }}">
+                    <button type="submit" class="btn-action">Reject</button>
+                </form>
+            </div>
+        {% endif %}
+        <div class="navigation-buttons">
+            <a href="{{ path('invitation_list') }}" class="btn-back">Back to Invitations List</a>
+            <a href="{{ path('app_wishlists_index') }}" class="btn-back">Back to MyWishlists</a>
+        </div>
+    </div>
+{% endblock %}

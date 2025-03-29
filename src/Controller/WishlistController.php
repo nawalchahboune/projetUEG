@@ -4,7 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Wishlist;
 use App\Entity\Item;
-use App\Entity\User; // Add missing User entity import
+use App\Entity\User;
+use App\Entity\Invitation; // Ajout de l'import de l'entité Invitation
 use App\Form\ItemType;
 use App\ItemForm\WishlistType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +21,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 #[Route('/myWishlist')]
 class WishlistController extends AbstractController
 {
-    // Move specific routes BEFORE the generic {id} route
     #[IsGranted('ROLE_USER')]
     #[Route('/create', name: 'app_wishlist_create')]
     public function create(Request $request, EntityManagerInterface $entityManager): Response
@@ -42,12 +42,15 @@ class WishlistController extends AbstractController
                 foreach ($usernames as $username) {
                     if (!empty($username)) {
                         $user = $entityManager->getRepository(\App\Entity\User::class)
-                                            ->findOneBy(['username' => $username]);
+                                                ->findOneBy(['username' => $username]);
                         if ($user) {
-                            // ajouter directement le collaborateur à la wishlist
-                            $wishlist->addCollaborator($user);
-                            $entityManager->flush();
-                            // Créer une invitation, selon votre logique
+                            // Ancien code pour ajouter directement le collaborateur :
+                            // $wishlist->addCollaborator($user);
+                            // $entityManager->flush();
+                            
+                            // Nouveau code : envoyer une invitation
+                            $invitation = new Invitation($wishlist, $this->getUser(), $user);
+                            $entityManager->persist($invitation);
                         }
                     }
                 }
@@ -61,7 +64,7 @@ class WishlistController extends AbstractController
         }
 
         return $this->render('wishlist/create.html.twig', [
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -74,13 +77,13 @@ class WishlistController extends AbstractController
         if (!$wishlist) {
             throw $this->createNotFoundException('La liste de souhaits n\'existe pas');
         }
-        $user= $this->getUser();
+        $user = $this->getUser();
         
         return $this->render('wishlist/index.html.twig', [
             'wishlist' => $wishlist,
             'items' => $wishlist->getItems(),
             'user' => $user,
-            'aim'=>'toBuy'
+            'aim'  => 'toBuy'
         ]);
     }
 
@@ -99,7 +102,6 @@ class WishlistController extends AbstractController
         }
     }
 
-    // Then place the generic {id} route AFTER specific routes
     #[IsGranted('ROLE_USER')]
     #[Route('/{id}', name: 'app_wishlist_show', requirements: ['id' => '\d+'])]
     public function show(Wishlist $wishlist): Response
@@ -124,7 +126,7 @@ class WishlistController extends AbstractController
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à supprimer cette liste');
         }
         
-        if ($this->isCsrfTokenValid('delete'.$wishlist->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $wishlist->getId(), $request->request->get('_token'))) {
             $entityManager->remove($wishlist);
             $entityManager->flush();
             
