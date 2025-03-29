@@ -17,13 +17,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Form\FormError;  
 
 #[Route('/myWishlists')]
 #[IsGranted('ROLE_USER')]
 class WishlistsController extends AbstractController
 {
     #[Route('/', name: 'app_wishlists_index')]
-    public function index(WishlistRepository $wishlistRepository,UserRepository $userRepository): Response
+    public function index(WishlistRepository $wishlistRepository, UserRepository $userRepository): Response
     {
         // Récupérer l'utilisateur connecté
         $user = $this->getUser();
@@ -31,8 +32,6 @@ class WishlistsController extends AbstractController
         // Si aucun utilisateur n'est connecté, on affiche une page basique ou on redirige
         if (!$user) {
             return $this->render('security/login.html.twig');
-            // Ou rediriger vers la page de login
-            // return $this->redirectToRoute('app_login');
         }
         $users = $userRepository->findAll();
         
@@ -43,8 +42,7 @@ class WishlistsController extends AbstractController
         return $this->render('wishlists/index.html.twig', [
             'wishlists' => $wishlists,
             'wishlistsIamCollaborator' => $wishlistsIamCollaborator,
-            'users'=>$users
-            
+            'users' => $users
         ]);
     }
 
@@ -60,10 +58,15 @@ class WishlistsController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($wishlist);
-            $entityManager->flush();
-            
-            return $this->redirectToRoute('app_wishlists_index');
+            // Vérifier que la date limite est strictement supérieure à la date du jour
+            if ($wishlist->getDeadline() !== null && $wishlist->getDeadline() <= new \DateTime('today')) {
+                // Ajoute une erreur sur le champ deadline
+                $form->get('deadline')->addError(new FormError('La date limite doit être supérieure à la date du jour.'));
+            } else {
+                $entityManager->persist($wishlist);
+                $entityManager->flush();
+                return $this->redirectToRoute('app_wishlists_index');
+            }
         }
         
         return $this->render('wishlists/create.html.twig', [
@@ -74,7 +77,7 @@ class WishlistsController extends AbstractController
     #[Route('/{id}/edit', name: 'app_wishlists_edit')]
     public function edit(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
-        // Check if user is the owner
+        // Check if user is the owner or collaborator
         if ($wishlist->getOwner() !== $this->getUser() && !$wishlist->getCollaborators()->contains($this->getUser())) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette liste');
         }
@@ -83,8 +86,8 @@ class WishlistsController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
+            // Optional: add a similar check for deadline here if needed
             $entityManager->flush();
-            
             return $this->redirectToRoute('app_wishlists_index');
         }
         
@@ -97,15 +100,14 @@ class WishlistsController extends AbstractController
     #[Route('/{id}/delete', name: 'app_wishlists_delete', methods: ['POST'])]
     public function delete(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
-        // Check if user is the owner
         if ($wishlist->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à supprimer cette liste');
         }
         
-        if ($this->isCsrfTokenValid('delete'.$wishlist->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $wishlist->getId(), $request->request->get('_token'))) {
             $entityManager->remove($wishlist);
             $entityManager->flush();
-                    }
+        }
         
         return $this->redirectToRoute('app_wishlists_index');
     }
@@ -113,7 +115,6 @@ class WishlistsController extends AbstractController
     #[Route('/{id}/getUrl', name: 'app_wishlists_get_url')]
     public function getUrl(Wishlist $wishlist, SluggerInterface $slugger): Response
     {
-        // Check if user is owner or collaborator
         if ($wishlist->getOwner() !== $this->getUser() && !$wishlist->getCollaborators()->contains($this->getUser())) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette liste');
         }
@@ -137,7 +138,14 @@ class WishlistsController extends AbstractController
         $wishlist->setOwner($this->getUser());
         
         if (isset($data['deadline'])) {
-            $wishlist->setDeadline(new \DateTime($data['deadline']));
+            $deadline = new \DateTime($data['deadline']);
+            if ($deadline <= new \DateTime('today')) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'La date limite doit être supérieure à la date du jour.'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $wishlist->setDeadline($deadline);
         }
         
         $entityManager->persist($wishlist);
@@ -153,28 +161,44 @@ class WishlistsController extends AbstractController
     #[Route('/{id}/share', name: 'wishlist_share', methods: ['POST'])]
     public function shareWishlist(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
-        // Check if current user is owner
+        // Vérifier que l'utilisateur connecté est bien le propriétaire
         if ($wishlist->getOwner() !== $this->getUser()) {
             $this->addFlash('error', 'Vous n\'avez pas l\'autorisation de partager cette liste.');
             return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
         }
 
-        $userIds = $request->request->get('user_ids');
-        if (is_array($userIds)) {
-            $users = new ArrayCollection();
+        // Récupérer les noms d'utilisateur soumis
+        // On s'attend à recevoir un tableau de strings (les usernames)
+        $usernames = $request->request->get('usernames', []);
+        if (!is_array($usernames)) {
+            // Si c'est une seule chaîne, on le transforme en tableau
+            $usernames = [$usernames];
+        }
 
-            foreach ($userIds as $userId) {                
-                $user = $entityManager->getRepository(User::class)->find($userId);                
-                if ($user) {                    
-                    $user->addInvitation(new Invitation($wishlist, $this->getUser(), $user));
-                }
+        $invalidUsernames = [];
+        foreach ($usernames as $username) {
+            $username = trim($username);
+            if (empty($username)) {
+                continue;
+            }
+            $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+            if (!$user) {
+                $invalidUsernames[] = $username;
+            } else {
+                // Ajouter une invitation pour l'utilisateur trouvé
+                $user->addInvitation(new Invitation($wishlist, $this->getUser(), $user));
             }
         }
+
+        if (count($invalidUsernames) > 0) {
+            $this->addFlash('error', 'Les noms d\'utilisateur suivants n\'existent pas : ' . implode(', ', $invalidUsernames));
+            return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+        }
+
         $entityManager->flush();
-
-
 
         $this->addFlash('success', 'La liste de souhaits a été partagée avec succès.');
         return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
     }
+
 }
