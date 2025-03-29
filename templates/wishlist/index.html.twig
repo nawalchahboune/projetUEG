@@ -3,390 +3,88 @@
 {% block title %}{{ wishlist.name }} - Liste de souhaits{% endblock %}
 
 {% block stylesheets %}
-{{ parent() }}
-<style>
-    .shared-wishlist-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-
-    }
-    
-    .shared-header {
-        background-color: #f9f9f9;
-        padding: 2rem;
-        border-radius: 8px;
-        margin-bottom: 2rem;
-        position: relative;
-    }
-    
-    .shared-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #0f1d36;
-        margin-bottom: 1rem;
-    }
-    
-    .shared-description {
-        color: #666;
-        font-size: 1.1rem;
-        max-width: 800px;
-        margin: 0 auto 1.5rem;
-    }
-    
-    .shared-meta {
-        display: flex;
-        gap: 2rem;
-        color: #777;
-        font-size: 0.9rem;
-    }
-    
-    .shared-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .user-info {
-        background-color: white;
-        padding: 1rem 2rem;
-        border-radius: 50px;
-        display: inline-flex;
-        align-items: center;
-        gap: 1rem;
-        margin: 1.5rem auto;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-    }
-    
-    .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-    
-    .user-name {
-        font-weight: 600;
-        color: #0f1d36;
-    }
-    
-    /* Items grid */
-    .items-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
-    }
-    
-    .item-card {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        overflow: hidden;
-        background-color: white;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-    
-    .item-image-container {
-        position: relative;
-        height: 180px;
-        overflow: hidden;
-    }
-    
-    .item-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s ease;
-    }
-    
-    .item-card:hover .item-image {
-        transform: scale(1.05);
-    }
-    
-    .item-price {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background-color: #0f1d36;
-        color: white;
-        padding: 0.4rem 0.8rem;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    
-    .item-status {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        padding: 0.3rem 0.7rem;
-        border-radius: 20px;
-        font-weight: 500;
-        font-size: 0.8rem;
-        z-index: 1;
-    }
-    
-    .status-available {
-        background-color: #e3f7e3;
-        color: #2c7a2c;
-    }
-    
-    .status-purchased {
-        background-color: #ffe9e9;
-        color: #c53030;
-    }
-    
-    .purchased-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        pointer-events: none;
-        z-index: 1;
-    }
-    
-    .purchased-text {
-        background-color: #c53030;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-        font-weight: 600;
-        transform: rotate(-15deg);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    
-    .item-content {
-        padding: 1.5rem;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .item-name {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #0f1d36;
-        margin-bottom: 0.5rem;
-    }
-    
-    .item-description {
-        color: #666;
-        font-size: 0.95rem;
-        margin-bottom: 1rem;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        flex-grow: 1;
-    }
-    
-    .item-priority {
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .priority-label {
-        font-size: 0.85rem;
-        color: #777;
-    }
-    
-    .priority-indicator {
-        flex-grow: 1;
-        height: 5px;
-        background-color: #eee;
-        border-radius: 3px;
-        overflow: hidden;
-    }
-    
-    .priority-bar {
-        height: 100%;
-        background-color: #0f1d36;
-    }
-    
-    .priority-high .priority-bar {
-        width: 100%;
-    }
-    
-    .priority-medium .priority-bar {
-        width: 60%;
-    }
-    
-    .priority-low .priority-bar {
-        width: 30%;
-    }
-    
-    .item-action {
-        margin-top: auto;
-    }
-    .item-actions {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    display: flex;
-    gap: 0.5rem;
-    z-index: 2; 
-}
-
-
-
-.item-actions .btn:hover {
-    opacity: 1;
-}
-
-.item-price {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background-color: #0f1d36;
-    color: white;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    z-index: 2;
-}
-    
-    .purchase-btn {
-        width: 100%;
-        padding: 0.8rem;
-        background-color: #0f1d36;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    
-    .purchase-btn:hover {
-        background-color: #1a2e4c;
-    }
-    
-    .purchase-btn.disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-    }
-    
-    .view-btn {
-        width: 100%;
-        padding: 0.8rem;
-        background-color: white;
-        color: #0f1d36;
-        border: 1px solid #0f1d36;
-        border-radius: 5px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 0.5rem;
-    }
-    
-    .view-btn:hover {
-        background-color: #f5f5f5;
-    }
-    
-    .empty-wishlist {
-        grid-column: 1 / -1;
-        padding: 3rem;
-        text-align: center;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.05);
-        margin-top: 2rem;
-    }
-    
-    .empty-title {
-        font-size: 1.5rem;
-        color: #0f1d36;
-        margin-bottom: 1rem;
-    }
-    
-    .return-home {
-        padding: 0.7rem 1.2rem;
-        background-color: #0f1d36;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 1rem;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 1.5rem;
-    }
-    
-    .return-home:hover {
-        background-color: #1a2e4c;
-    }
-    
-    .share-options {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin: 2rem 0;
-    }
-    
-    .share-btn {
-        padding: 0.7rem 1.2rem;
-        background-color: white;
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        cursor: pointer;
-        border: 1px solid #ddd;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    
-    .share-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    }
-    
-    /* Button colors for different platforms */
-    .share-facebook {
-        color: #3b5998;
-    }
-    
-    .share-twitter {
-        color: #1da1f2;
-    }
-    
-    .share-whatsapp {
-        color: #25d366;
-    }
-    
-    .share-email {
-        color: #c53030;
-    }
-    
-    .share-link {
-        color: #0f1d36;
+    {{ parent() }}
+    <style>
+        .shared-wishlist-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
         
-    }
-
-</style>
+        .shared-header {
+            background-color: #f9f9f9;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .shared-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color:rgb(0, 0, 0);
+            margin-bottom: 1rem;
+        }
+        
+        .shared-meta {
+            display: flex;
+            gap: 2rem;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .btn-group-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn-back {
+            background-color:rgb(77, 219, 124);
+            color: #fff;
+        }
+        
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-creer {
+            background-color:rgb(208, 144, 35);
+            color: #fff;
+        }
+        
+        .btn-creer:hover {
+            background-color: #1a2e4c;
+        }
+        
+        .btn-supprimer {
+            background-color: #d9534f;
+            color: #fff;
+        }
+        
+        .btn-supprimer:hover {
+            background-color: #c9302c;
+        }
+        
+        .btn-disabled {
+            background-color: #ccc !important;
+            cursor: not-allowed;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
@@ -394,31 +92,37 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="shared-title mb-0">
             {{ wishlist.name }}
-            {% if wishlist.isExpired() %}<span class="badge bg-secondary">Expirée</span>{% endif %}
+            {% if wishlist.isExpired() %}
+                <span class="badge bg-secondary">Expirée</span>
+            {% endif %}
         </h1>
         
-        <div class="d-flex gap-2">
-            <a href="{{ path('app_wishlists_index') }}" class="btn back-to-lists-btn">
+        <div class="btn-group-actions">
+            <a href="{{ path('app_wishlists_index') }}" class="btn btn-back">
                 <i class="fas fa-arrow-left"></i> Retour à mes listes
             </a>
             
-            {% if not wishlist.isExpired() %}
+            {% if not wishlist.isExpired() and (wishlist.owner == app.user or app.user in wishlist.collaborators) %}
                 <a href="{{ path('add_item', {'idWishlist': wishlist.id}) }}" class="btn btn-creer">
                     Ajouter un cadeau
                 </a>
             {% else %}
-                <button class="btn btn-creer opacity-50" disabled>
+                <button class="btn btn-creer btn-disabled" disabled>
                     Ajouter un cadeau
                 </button>
             {% endif %}
             
-            <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste?');" style="display: inline;">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
-                <button type="submit" class="btn btn-supprimer">
-                    Supprimer la liste
-                </button>
-            </form>
+            {% if wishlist.owner == app.user %}
+                <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" 
+                    onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste?');" style="margin: 0;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
+                    <button type="submit" class="btn btn-supprimer">
+                        Supprimer la liste
+                    </button>
+                </form>
+            {% endif %}
         </div>
+
     </div>
 
     <div class="shared-header">
@@ -433,30 +137,24 @@
     <div class="items-grid">
         {% if items|length > 0 %}
             {% for item in items %}
-
                 <div class="item-card">
                     <div class="item-image-container">
-                                {% if aim is defined and aim == 'toBuy' and (not item.hasPurchased) %}
-                                <button 
-                                class="btn btn-primary" 
-                                onclick="window.location.href='{{ path('gift_proof_form', {'id': item.id}) }}'">
-                                Add Prooft
-                            </button>                                
-                            
-                            {% endif %}
+                        {% if aim is defined and aim == 'toBuy' and (not item.hasPurchased) %}
+                            <button class="btn btn-primary" onclick="window.location.href='{{ path('gift_proof_form', {'id': item.id}) }}'">
+                                Add Proof
+                            </button>
+                        {% endif %}
                         {% if item.price %}
                             <div class="item-price">{{ item.price|number_format(2, ',', ' ') }} €</div>
                         {% endif %}
                         {% if (aim is not defined or aim != 'toBuy') %}
-                        <a href="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="delete-btn" onclick="return confirm('Are you sure you want to delete this item?');">
-                         </a>
+                            <a href="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="delete-btn" onclick="return confirm('Are you sure you want to delete this item?');">
+                            </a>
                         {% endif %}
-
                         <div class="item-actions">
                             <a href="{{ path('edit_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="btn btn-icon btn-creer">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            
                             <a href="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" class="btn btn-icon btn-supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
                                 <i class="fas fa-trash"></i>
                             </a>
@@ -477,32 +175,24 @@
                                 <a href="{{ item.url }}" target="_blank" class="view-btn">
                                     <i class="fas fa-shopping-cart"></i> Voir en boutique
                                 </a>
-
-                                {% else %}
-                                <p class="view-btn" > Aucun URL n'est fournie!</p>
+                            {% else %}
+                                <p class="view-btn">Aucun URL n'est fourni!</p>
                             {% endif %}
                         </div>
                     </div>
                 </div>
             {% endfor %}
         {% else %}
-            <div class="empty-wishlist">
-                <h2 class="empty-title">Cette liste de souhaits est vide</h2>
-                <p>Il n'y a actuellement aucun cadeau dans cette liste.</p>
-                <a href="{{ path('app_home') }}" class="return-home">
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_wishlists_index') }}" class="btn btn-retour">
+                    <i class="fas fa-arrow-left"></i> Retour à mes listes
+                </a>
+                <a href="{{ path('app_home') }}" class="btn btn-retour">
                     <i class="fas fa-home"></i> Retour à l'accueil
                 </a>
             </div>
+
         {% endif %}
     </div>
 </div>
 {% endblock %}
-
-{% block javascripts %}
-{{ parent() }}
-<script>
-    // [Previous JavaScript remains the same]
-</script>
-{% endblock %}
-
-
