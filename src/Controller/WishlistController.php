@@ -6,6 +6,7 @@ use App\Entity\Wishlist;
 use App\Entity\Item;
 use App\Entity\User;
 use App\Entity\Invitation; // Ajout de l'import de l'entité Invitation
+use App\Repository\ItemRepository;
 use App\Form\ItemType;
 use App\ItemForm\WishlistType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -104,18 +105,29 @@ class WishlistController extends AbstractController
 
     #[IsGranted('ROLE_USER')]
     #[Route('/{id}', name: 'app_wishlist_show', requirements: ['id' => '\d+'])]
-    public function show(Wishlist $wishlist): Response
+    public function show(Wishlist $wishlist, Request $request, ItemRepository $itemRepository): Response
     {
         // Check if user is owner or collaborator
         if ($wishlist->getOwner() !== $this->getUser() && !$wishlist->getCollaborators()->contains($this->getUser())) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette liste');
         }
         
+        // Get the 'sort' query parameter (default to ascending order)
+        $sortParam = $request->query->get('sort', 'asc');
+        $sortOrder = ($sortParam === 'desc') ? 'DESC' : 'ASC';
+        
+        // Fetch items for this wishlist, sorted by price
+        $items = $itemRepository->findBy(
+            ['wishlist' => $wishlist],
+            ['price' => $sortOrder]
+        );
+        
         return $this->render('wishlist/index.html.twig', [
             'wishlist' => $wishlist,
-            'items' => $wishlist->getItems(),
+            'items' => $items,
         ]);
     }
+
 
     #[IsGranted('ROLE_USER')]
     #[Route('/{id}/deleteWishlist', name: 'app_wishlist_delete_wishlist', methods: ['POST'])]
