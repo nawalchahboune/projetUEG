@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Wishlist;
 use App\Entity\Invitation;
-use App\Controller\WishlistType;
+use App\ItemForm\WishlistType;
 use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Repository\WishlistRepository;
@@ -58,11 +58,26 @@ class WishlistsController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            // Vérifier que la date limite est strictement supérieure à la date du jour
+            // Validate deadline: must be strictly greater than today if set
             if ($wishlist->getDeadline() !== null && $wishlist->getDeadline() <= new \DateTime('today')) {
-                // Ajoute une erreur sur le champ deadline
                 $form->get('deadline')->addError(new FormError('La date limite doit être supérieure à la date du jour.'));
             } else {
+                // Process collaborators from the hidden input field
+                $collaboratorsInput = $request->request->get('collaborators_hidden', '');
+                if (!empty($collaboratorsInput)) {
+                    $usernames = array_filter(array_map('trim', explode(',', $collaboratorsInput)));
+                    foreach ($usernames as $username) {
+                        if (!empty($username)) {
+                            $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+                            if ($user) {
+                                $wishlist->addCollaborator($user);
+                            } else {
+                                // Optional: add flash message or log error if user not found
+                                $this->addFlash('error', "L'utilisateur '{$username}' n'a pas été trouvé.");
+                            }
+                        }
+                    }
+                }
                 $entityManager->persist($wishlist);
                 $entityManager->flush();
                 return $this->redirectToRoute('app_wishlists_index');
@@ -70,32 +85,60 @@ class WishlistsController extends AbstractController
         }
         
         return $this->render('wishlists/create.html.twig', [
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
+
 
     #[Route('/{id}/edit', name: 'app_wishlists_edit')]
     public function edit(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
-        // Check if user is the owner or collaborator
+        // Allow access if the user is either the owner or is already a collaborator
         if ($wishlist->getOwner() !== $this->getUser() && !$wishlist->getCollaborators()->contains($this->getUser())) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette liste');
         }
-        
-        $form = $this->createForm(WishlistType::class, $wishlist);
+
+        // Pass the option to include collaborators field in the form.
+        $form = $this->createForm(WishlistType::class, $wishlist, [
+            'include_collaborators' => true
+        ]);
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
-            // Optional: add a similar check for deadline here if needed
+            // Process collaborators from the hidden field
+            $collaboratorsInput = $request->request->get('collaborators_hidden', '');
+            if (!empty($collaboratorsInput)) {
+                $usernames = array_filter(array_map('trim', explode(',', $collaboratorsInput)));
+                // Remove collaborators that are no longer in the hidden field
+                foreach ($wishlist->getCollaborators() as $collaborator) {
+                    if (!in_array($collaborator->getUsername(), $usernames)) {
+                        $wishlist->removeCollaborator($collaborator);
+                    }
+                }
+                // Add new collaborators not already in the collection
+                foreach ($usernames as $username) {
+                    $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+                    if ($user && !$wishlist->getCollaborators()->contains($user)) {
+                        $wishlist->addCollaborator($user);
+                    }
+                }
+            } else {
+                // If the hidden field is empty, you might want to remove all collaborators:
+                foreach ($wishlist->getCollaborators() as $collaborator) {
+                    $wishlist->removeCollaborator($collaborator);
+                }
+            }
+
             $entityManager->flush();
             return $this->redirectToRoute('app_wishlists_index');
         }
-        
+
         return $this->render('wishlists/edit.html.twig', [
-            'form' => $form,
+            'form' => $form->createView(),
             'wishlist' => $wishlist,
         ]);
     }
+
 
     #[Route('/{id}/delete', name: 'app_wishlists_delete', methods: ['POST'])]
     public function delete(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response

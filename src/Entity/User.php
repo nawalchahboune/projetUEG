@@ -65,6 +65,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     #[ORM\ManyToMany(targetEntity: Wishlist::class, mappedBy: 'collaborators')]
     private Collection $collaborativeWishlists;
 
+
     private Collection $myInvitations;
 
     #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: Notification::class, orphanRemoval: true)]
