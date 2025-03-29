@@ -392,16 +392,26 @@
 {% block body %}
 <div class="shared-wishlist-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <h2>{{ wishlist.name }}</h2>
+        <h1 class="shared-title mb-0">
+            {{ wishlist.name }}
+            {% if wishlist.isExpired() %}<span class="badge bg-secondary">Expirée</span>{% endif %}
+        </h1>
         
-        <div class="d-flex gap-2 box-shadow: 0 3px 8px rgba(0,0,0,0.05);">
+        <div class="d-flex gap-2">
             <a href="{{ path('app_wishlists_index') }}" class="btn back-to-lists-btn">
                 <i class="fas fa-arrow-left"></i> Retour à mes listes
             </a>
-            <a href="{{ path('add_item', {'idWishlist': wishlist.id}) }}" class="btn btn-creer">
-                Ajouter un cadeau
-            </a>
+            
+            {% if not wishlist.isExpired() %}
+                <a href="{{ path('add_item', {'idWishlist': wishlist.id}) }}" class="btn btn-creer">
+                    Ajouter un cadeau
+                </a>
+            {% else %}
+                <button class="btn btn-creer opacity-50" disabled>
+                    Ajouter un cadeau
+                </button>
+            {% endif %}
+            
             <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste?');" style="display: inline;">
                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
                 <button type="submit" class="btn btn-supprimer">
