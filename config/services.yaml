@@ -8,7 +8,7 @@ parameters:
   proofs_directory: '%kernel.project_dir%/public/images/proofs'
 
 services:
-  App\EventListener\AccessDeniedListener:
+  App\Exceptions\AccessDeniedListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
   # default configuration for services in *this* file

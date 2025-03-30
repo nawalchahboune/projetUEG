@@ -108,61 +108,77 @@
             margin-bottom: 1rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: transform 0.3s ease;
+            position: relative;
         }
         
         .item-card:hover {
             transform: translateY(-2px);
         }
         
-        .item-image-container {
-            flex: 0 0 150px;
-            margin-right: 1rem;
-            position: relative;
-            height: 100px;
-            overflow: hidden;
-        }
-        
-        .item-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
+        .item-card.purchased {
+            opacity: 0.6;
         }
         
         .item-content {
             flex: 1;
+            /* Pour aligner les éléments sur une même colonne */
+        }
+        
+        .item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         
         .item-name {
             font-size: 1.2rem;
             font-weight: 600;
             color: #0f1d36;
-            margin: 0 0 0.5rem 0;
+            margin: 0;
+        }
+        
+        .item-price {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #0f1d36;
+            background-color: #e0e0e0;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
         }
         
         .item-description {
             color: #666;
             font-size: 0.95rem;
-            margin: 0;
+            margin: 0.5rem 0;
         }
         
-        .item-price {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background-color: #0f1d36;
-            color: white;
-            padding: 0.3rem 0.6rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
+        .item-action {
+            margin-top: 0.5rem;
+        }
+        
+        .item-action .view-btn {
+            text-decoration: none;
+            font-size: 0.95rem;
+            color: #007bff;
+        }
+        
+        /* Purchased overlay styles */
+        .purchased-info {
+            display: none;
+            margin-top: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+        .item-card.purchased:hover .purchased-info {
+            display: block;
         }
     </style>
 {% endblock %}
 
 {% block body %}
 <div class="shared-wishlist-container">
-    <!-- Header with title and action buttons -->
+    <!-- Header avec titre et actions -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="shared-title mb-0">
             {{ wishlist.name }}
@@ -208,7 +224,7 @@
         </div>
     </div>
     
-    <!-- Sorting Buttons -->
+    <!-- Boutons de tri -->
     <div class="sort-buttons">
         <a href="{{ path('app_wishlist_show', {'id': wishlist.id, 'sort': 'asc'}) }}" class="btn btn-creer">
             Prix Croissant
@@ -218,28 +234,42 @@
         </a>
     </div>
     
-    <!-- Items List -->
+    <!-- Liste des items -->
     <ul class="items-list">
         {% if items|length > 0 %}
             {% for item in items %}
-                <li class="item-card">
-                    <div class="item-image-container">
+                <li class="item-card {{ item.hasPurchased ? 'purchased' : '' }}">
+                    <div class="item-content">
+                        <div class="item-header">
+                            <h3 class="item-name">{{ item.name }}</h3>
+                            {% if item.price %}
+                                <span class="item-price">{{ item.price|number_format(2, ',', ' ') }} €</span>
+                            {% endif %}
+                        </div>
+                        <p class="item-description">{{ item.description|default('Aucune description disponible') }}</p>
+                        
+                        {# Bouton "Add Proof" s'il faut ajouter une preuve et que l'item n'est pas acheté #}
                         {% if aim is defined and aim == 'toBuy' and (not item.hasPurchased) %}
                             <button class="btn btn-primary" onclick="window.location.href='{{ path('gift_proof_form', {'id': item.id}) }}'">
                                 Add Proof
                             </button>
                         {% endif %}
-                        {% if item.price %}
-                            <div class="item-price">{{ item.price|number_format(2, ',', ' ') }} €</div>
+                        
+                        {# Affichage des infos de la preuve si l'item est acheté #}
+                        {% if item.hasPurchased and item.proof is defined %}
+                            <div class="purchased-info">
+                                <strong>{{ item.proof.buyer.username }}</strong>
+                                <p>{{ item.proof.congratsMessage }}</p>
+                                {% if app.user and item.proof.buyer.id == app.user.id %}
+                                    <a href="{{ path('edit_proof', {'id': item.proof.id}) }}">Edit Message</a>
+                                {% endif %}
+                            </div>
                         {% endif %}
-                        <img src="{{ asset('images/default_item.jpg') }}" alt="{{ item.name }}" class="item-image">
-                    </div>
-                    <div class="item-content">
-                        <h3 class="item-name">{{ item.name }}</h3>
-                        <p class="item-description">{{ item.description|default('Aucune description disponible') }}</p>
+                        
                         <div class="item-action">
                             {% if item.url %}
-                                <a href="{{ item.url }}" target="_blank" class="view-btn">
+                                {% set fixedUrl = item.url starts with 'http' ? item.url : 'https://' ~ item.url %}
+                                <a href="{{ fixedUrl }}" target="_blank" class="view-btn">
                                     <i class="fas fa-shopping-cart"></i> Voir en boutique
                                 </a>
                             {% else %}
@@ -247,6 +277,7 @@
                             {% endif %}
                         </div>
                     </div>
+                    
                     <form method="post" action="{{ path('delete_item', {'idWishlist': wishlist.id, 'idItem': item.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');" style="margin-left: auto;">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ item.id) }}">
                         <button type="submit" class="btn btn-supprimer">
