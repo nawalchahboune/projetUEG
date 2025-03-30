@@ -17,14 +17,24 @@ class Invitation
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: Wishlist::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Wishlist $wishlist = null;
 
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $sender = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'myInvitations')]
     private ?User $receiver = null;
 
+    // Tant que l'utilisateur n'a pas accepté l'invitation, il n'est pas collaborateur et accepted est null
+    // Quand l'utilisateur accepte l'invitation, il devient collaborateur et accepted est true
+    // Quand l'utilisateur refuse l'invitation, il n'est pas collaborateur et accepted est false
+    #[ORM\Column(type: "boolean", nullable: true)]
     private ?bool $accepted = null;
+
 
     public function __construct(?Wishlist $wishlist, ?User $sender, ?User $receiver)
     {
@@ -34,7 +44,7 @@ class Invitation
         $this->wishlist = $wishlist;
         $this->sender = $sender;
         $this->receiver = $receiver;
-        $this->accepted = false;
+        $this->accepted = null;
     }
 
     public function getId(): ?int

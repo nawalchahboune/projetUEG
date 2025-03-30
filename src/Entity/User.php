@@ -13,6 +13,7 @@ use MyInvitationPage as GlobalMyInvitationPage;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Entity\Item;
 use App\Entity\Wishlist;
 use App\Interfaces\MyWishlistPage;
@@ -20,6 +21,8 @@ use myWishlistListPage as GlobalMyWishlistListPage;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[UniqueEntity(fields: ['username'], message: 'Le nom d\'utilisateur est déjà pris.')]
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvitationPage, MyWishlistsListPage
 {
     #[ORM\Id]
@@ -62,12 +65,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     #[ORM\ManyToMany(targetEntity: Wishlist::class, mappedBy: 'collaborators')]
     private Collection $collaborativeWishlists;
 
+
     private Collection $myInvitations;
 
     #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: Notification::class, orphanRemoval: true)]
     private Collection $receivedNotifications;
-
-
 
     public function __construct()
     {
@@ -90,7 +92,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setFirstName(string $firstName): static
     {
         $this->firstName = $firstName;
-
         return $this;
     }
 
@@ -102,7 +103,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setLastName(string $lastName): static
     {
         $this->lastName = $lastName;
-
         return $this;
     }
 
@@ -114,7 +114,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setUsername(string $username): static
     {
         $this->username = $username;
-
         return $this;
     }
 
@@ -126,7 +125,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -138,7 +136,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
 
@@ -150,7 +147,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setPhoto(?string $photo): static
     {
         $this->photo = $photo;
-
         return $this;
     }
 
@@ -162,7 +158,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setLockStatus(bool $lockStatus): static
     {
         $this->lockStatus = $lockStatus;
-
         return $this;
     }
 
@@ -174,7 +169,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function setType(string $type): static
     {
         $this->type = $type;
-
         return $this;
     }
 
@@ -189,14 +183,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
             $this->receivedNotifications->add($notification);
             $notification->setRecipient($this);
         }
-
         return $this;
     }
 
     public function setReceivedNotifications(Collection $notifications): self
     {
         $this->receivedNotifications = $notifications;
-
         return $this;
     }
 
@@ -214,19 +206,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
             $this->ownedWishlists->add($wishlist);
             $wishlist->setOwner($this);
         }
-
         return $this;
     }
 
     public function removeOwnedWishlist(Wishlist $wishlist): self
     {
         if ($this->ownedWishlists->removeElement($wishlist)) {
-            // set the owning side to null (unless already changed)
             if ($wishlist->getOwner() === $this) {
                 $wishlist->setOwner(null);
             }
         }
-
         return $this;
     }
 
@@ -244,7 +233,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
             $this->collaborativeWishlists->add($wishlist);
             $wishlist->addCollaborator($this);
         }
-
         return $this;
     }
 
@@ -253,7 +241,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
         if ($this->collaborativeWishlists->removeElement($wishlist)) {
             $wishlist->removeCollaborator($this);
         }
-
         return $this;
     }
 
@@ -271,10 +258,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
             $this->myInvitations->add($invitation);
             $invitation->setReceiver($this);
         }
-
         return $this;
     }
-
 
     // Required methods for UserInterface
     public function getRoles(): array
@@ -286,10 +271,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
         return array_unique($roles);
     }
 
-
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
+        // Clear any temporary, sensitive data if stored
     }
 
     public function getUserIdentifier(): string
@@ -302,6 +286,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     {
         $invitation->setAccepted(true);
     }
+
     // MyWishlistListPage interface methods
     public function createWishlist(string $title, ?\DateTimeInterface $deadline): ?Wishlist
     {
@@ -316,7 +301,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
     public function deleteWishlist(?Wishlist $wishlist): void
     {
         $this->removeOwnedWishlist($wishlist);
-        
     }
 
     public function shareWishlist(?Wishlist $wishlist, Collection $users): void
@@ -328,9 +312,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, MyInvit
 
     public function displayWishlist(?Wishlist $wishlist, Collection $users): void
     {
-        // A IMPLEMENTER !
+        // To be implemented!
     }
-  
-
-
 }

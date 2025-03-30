@@ -37,6 +37,7 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
     private ?User $owner = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'collaborativeWishlists')]
+    #[ORM\JoinTable(name: 'wishlist_user')]
     private Collection $collaborators;
 
     #[ORM\Column(length: 36, unique: true, nullable: true ,name: 'collaboration_token')]
@@ -81,6 +82,15 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
     {
         $this->publicToken = Uuid::v4()->toRfc4122();
         return $this;
+    }
+
+    public function isExpired(): bool
+    {
+        if ($this->deadline === null) {
+            return false;
+        }
+        
+        return $this->deadline < new \DateTime();
     }
 // composer require symfony/uid
     public function __construct(?string $name=null, ?DateTimeInterface $deadline=null )
@@ -162,29 +172,6 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
-    public function getCollaborators(): Collection
-    {
-        return $this->collaborators;
-    }
-
-    public function addCollaborator(User $collaborator): self
-    {
-        if (!$this->collaborators->contains($collaborator)) {
-            $this->collaborators->add($collaborator);
-        }
-
-        return $this;
-    }
-
-    public function removeCollaborator(User $collaborator): self
-    {
-        $this->collaborators->removeElement($collaborator);
-        return $this;
-    }
-
     public function editWishlist(Wishlist $wishlist): void
     {
         $this->name = $wishlist->getName();
@@ -216,4 +203,24 @@ class Wishlist implements \App\Interfaces\ViewUserWishlist, \App\Interfaces\MyWi
         $this->items = new ArrayCollection($itemsArray);
         $this->items = new ArrayCollection(iterator_to_array($iterator));
     }
+
+        public function getCollaborators(): Collection
+    {
+        return $this->collaborators;
+    }
+
+    public function addCollaborator(User $user): self
+    {
+        if (!$this->collaborators->contains($user)) {
+            $this->collaborators->add($user);
+        }
+        return $this;
+    }
+
+    public function removeCollaborator(User $user): self
+    {
+        $this->collaborators->removeElement($user);
+        return $this;
+    }
+
 }

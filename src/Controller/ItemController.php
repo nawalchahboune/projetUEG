@@ -16,16 +16,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class ItemController extends AbstractController
 {
-    #[Route('/{idItem}/delete', name: 'delete_item')]
+    #[Route('/{idItem}/delete', name: 'delete_item', methods: ['POST'])]
     public function delete(int $idWishlist, int $idItem, EntityManagerInterface $entityManager): Response
     {
         $wishlist = $entityManager->getRepository(Wishlist::class)->find($idWishlist);
+        $item=$entityManager->getRepository(Item::class)->find($idItem);
+         // Vérifie les permissions avec le Voter
+        $this->denyAccessUnlessGranted('DELETE', $item);
         if ($wishlist->getOwner() == $this->getUser() || $wishlist->getCollaborators()->contains($this->getUser())) {
-            $item=$entityManager->getRepository(Item::class)->find($idItem);
             $entityManager->remove($item);
             $entityManager->flush();
         }
-         
         return $this->render('wishlist/index.html.twig', [
             'wishlist' => $wishlist,
             'items' => $wishlist->getItems(),
@@ -37,6 +38,7 @@ final class ItemController extends AbstractController
     {
         $wishlist=$entityManager->getRepository(Wishlist::class)->find($idWishlist);
         $item= new Item();
+        $this->denyAccessUnlessGranted('ADD', $item);
         $form = $this->createForm(ItemFormType::class, $item);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -45,13 +47,11 @@ final class ItemController extends AbstractController
         if ($wishlist->getOwner() == $this->getUser() || $wishlist->getCollaborators()->contains($this->getUser())) {
             $entityManager->persist($item);
             $entityManager->flush();
+            return $this->redirectToRoute('app_wishlist_show', [
+                'id' => $idWishlist,
+            ]);
         }
-            
-                return $this->render('wishlist/index.html.twig', [
-                    'wishlist' => $wishlist,
-                    'items' => $wishlist->getItems(),
-                ]);
-        }
+        } 
         return $this->render('item/creatingItem.html.twig', [
             'wishlist' => $wishlist,
             'form' => $form->createView(),
@@ -63,7 +63,8 @@ final class ItemController extends AbstractController
     {
         $wishlist = $entityManager->getRepository(Wishlist::class)->find($idWishlist);
         $item = $entityManager->getRepository(Item::class)->find($idItem);
-        
+        $this->denyAccessUnlessGranted('EDIT', $item);
+
         // Check if item exists and belongs to this wishlist
         if (!$item || $item->getWishlist()->getId() !== $wishlist->getId()) {
             throw $this->createNotFoundException('Item not found in this wishlist');

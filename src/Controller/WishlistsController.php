@@ -4,10 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Wishlist;
 use App\Entity\Invitation;
-use App\Controller\WishlistType;
+use App\ItemForm\WishlistType;
 use App\Repository\UserRepository;
 use App\Entity\User;
 use App\Repository\WishlistRepository;
+use App\Repository\InvitationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,34 +18,40 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Form\FormError;  
 
 #[Route('/myWishlists')]
 #[IsGranted('ROLE_USER')]
 class WishlistsController extends AbstractController
 {
     #[Route('/', name: 'app_wishlists_index')]
-    public function index(WishlistRepository $wishlistRepository,UserRepository $userRepository): Response
-    {
+    public function index(
+        WishlistRepository $wishlistRepository, 
+        UserRepository $userRepository,
+        InvitationRepository $invitationRepository
+    ): Response {
         // Récupérer l'utilisateur connecté
         $user = $this->getUser();
         
         // Si aucun utilisateur n'est connecté, on affiche une page basique ou on redirige
         if (!$user) {
             return $this->render('security/login.html.twig');
-            // Ou rediriger vers la page de login
-            // return $this->redirectToRoute('app_login');
         }
+        
         $users = $userRepository->findAll();
         
         // Récupérer toutes les wishlists dont l'utilisateur est propriétaire
         $wishlists = $wishlistRepository->findBy(['owner' => $user]);
         $wishlistsIamCollaborator = $wishlistRepository->findCollaboratorWishlists($user);
         
+        // Récupérer les invitations où l'utilisateur est destinataire
+        $invitations = $invitationRepository->findBy(['receiver' => $user]);
+
         return $this->render('wishlists/index.html.twig', [
             'wishlists' => $wishlists,
             'wishlistsIamCollaborator' => $wishlistsIamCollaborator,
-            'users'=>$users
-            
+            'users' => $users,
+            'invitations' => $invitations,
         ]);
     }
 
@@ -52,6 +59,8 @@ class WishlistsController extends AbstractController
     public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $wishlist = new Wishlist();
+        $this->denyAccessUnlessGranted('ADD', $wishlist);
+
         $wishlist->setOwner($this->getUser());
         $wishlist->setPublicToken();
         $wishlist->setCollaborationToken();
@@ -60,36 +69,113 @@ class WishlistsController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($wishlist);
-            $entityManager->flush();
-            
-            return $this->redirectToRoute('app_wishlists_index');
+            // Validate deadline: must be strictly greater than today if set
+            if ($wishlist->getDeadline() !== null && $wishlist->getDeadline() <= new \DateTime('today')) {
+                $form->get('deadline')->addError(new FormError('La date limite doit être supérieure à la date du jour.'));
+            } else {
+                // Process collaborators from the hidden input field
+                $collaboratorsInput = $request->request->get('collaborators_hidden', '');
+                if (!empty($collaboratorsInput)) {
+                    $usernames = array_filter(array_map('trim', explode(',', $collaboratorsInput)));
+                    foreach ($usernames as $username) {
+                        if (!empty($username)) {
+                            $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+                            if ($user) {
+                                // Ancien code pour ajouter directement le collaborateur :
+                                // $wishlist->addCollaborator($user);
+                                
+                                // Nouveau code : envoyer une invitation
+                                $invitation = new Invitation($wishlist, $this->getUser(), $user);
+                                $entityManager->persist($invitation);
+                            } else {
+                                // Optionnel : ajouter un flash ou logger si l'utilisateur n'est pas trouvé
+                                $this->addFlash('error', "L'utilisateur '{$username}' n'a pas été trouvé.");
+                            }
+                        }
+                    }
+                }
+                $entityManager->persist($wishlist);
+                $entityManager->flush();
+                return $this->redirectToRoute('app_wishlists_index');
+            }
         }
         
         return $this->render('wishlists/create.html.twig', [
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_wishlists_edit')]
     public function edit(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
-        // Check if user is the owner
+        $this->denyAccessUnlessGranted('EDIT', $wishlist);
+
+        // Allow access if the user is either the owner or is already a collaborator
         if ($wishlist->getOwner() !== $this->getUser() && !$wishlist->getCollaborators()->contains($this->getUser())) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier cette liste');
         }
-        
-        $form = $this->createForm(WishlistType::class, $wishlist);
+
+        // Pass the option to include collaborators field in the form.
+        $form = $this->createForm(WishlistType::class, $wishlist, [
+            'include_collaborators' => true
+        ]);
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
+            // Process collaborators from the hidden field
+            $collaboratorsInput = $request->request->get('collaborators_hidden', '');
+            if (!empty($collaboratorsInput)) {
+                $usernames = array_filter(array_map('trim', explode(',', $collaboratorsInput)));
+                
+                // Ancien code pour mettre à jour les collaborateurs directement :
+                /*
+                // Remove collaborators that are no longer in the hidden field
+                foreach ($wishlist->getCollaborators() as $collaborator) {
+                    if (!in_array($collaborator->getUsername(), $usernames)) {
+                        $wishlist->removeCollaborator($collaborator);
+                    }
+                }
+                // Add new collaborators not already in the collection
+                foreach ($usernames as $username) {
+                    $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+                    if ($user && !$wishlist->getCollaborators()->contains($user)) {
+                        $wishlist->addCollaborator($user);
+                    }
+                }
+                */
+                
+                // Nouveau code : envoyer une invitation pour chaque username non déjà collaborateur
+                foreach ($usernames as $username) {
+                    $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+                    if ($user) {
+                        // On peut vérifier ici si une invitation existe déjà ou si l'utilisateur est déjà collaborateur
+                        if (
+                            !$wishlist->getCollaborators()->contains($user)
+                            // Vous pouvez ajouter ici une vérification d'existence d'invitation non acceptée si nécessaire
+                        ) {
+                            $invitation = new Invitation($wishlist, $this->getUser(), $user);
+                            $entityManager->persist($invitation);
+                        }
+                    } else {
+                        $this->addFlash('error', "L'utilisateur '{$username}' n'a pas été trouvé.");
+                    }
+                }
+            } else {
+                // Si le champ caché est vide, vous pouvez décider de ne rien faire ou gérer la suppression d'invitations/collaborateurs
+                // Ancien code pour supprimer tous les collaborateurs :
+                /*
+                foreach ($wishlist->getCollaborators() as $collaborator) {
+                    $wishlist->removeCollaborator($collaborator);
+                }
+                */
+            }
+
             $entityManager->flush();
-            
             return $this->redirectToRoute('app_wishlists_index');
         }
-        
+
         return $this->render('wishlists/edit.html.twig', [
-            'form' => $form,
+            'form' => $form->createView(),
             'wishlist' => $wishlist,
         ]);
     }
@@ -97,15 +183,16 @@ class WishlistsController extends AbstractController
     #[Route('/{id}/delete', name: 'app_wishlists_delete', methods: ['POST'])]
     public function delete(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
-        // Check if user is the owner
+        $this->denyAccessUnlessGranted('DELETE', $wishlist);
+
         if ($wishlist->getOwner() !== $this->getUser()) {
             throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à supprimer cette liste');
         }
         
-        if ($this->isCsrfTokenValid('delete'.$wishlist->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $wishlist->getId(), $request->request->get('_token'))) {
             $entityManager->remove($wishlist);
             $entityManager->flush();
-                    }
+        }
         
         return $this->redirectToRoute('app_wishlists_index');
     }
@@ -113,7 +200,6 @@ class WishlistsController extends AbstractController
     #[Route('/{id}/getUrl', name: 'app_wishlists_get_url')]
     public function getUrl(Wishlist $wishlist, SluggerInterface $slugger): Response
     {
-        // Check if user is owner or collaborator
         if ($wishlist->getOwner() !== $this->getUser() && !$wishlist->getCollaborators()->contains($this->getUser())) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cette liste');
         }
@@ -137,7 +223,14 @@ class WishlistsController extends AbstractController
         $wishlist->setOwner($this->getUser());
         
         if (isset($data['deadline'])) {
-            $wishlist->setDeadline(new \DateTime($data['deadline']));
+            $deadline = new \DateTime($data['deadline']);
+            if ($deadline <= new \DateTime('today')) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'La date limite doit être supérieure à la date du jour.'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            $wishlist->setDeadline($deadline);
         }
         
         $entityManager->persist($wishlist);
@@ -153,28 +246,45 @@ class WishlistsController extends AbstractController
     #[Route('/{id}/share', name: 'wishlist_share', methods: ['POST'])]
     public function shareWishlist(Request $request, Wishlist $wishlist, EntityManagerInterface $entityManager): Response
     {
-        // Check if current user is owner
+        $this->denyAccessUnlessGranted('SHARE', $wishlist);
+
+        // Vérifier que l'utilisateur connecté est bien le propriétaire
         if ($wishlist->getOwner() !== $this->getUser()) {
             $this->addFlash('error', 'Vous n\'avez pas l\'autorisation de partager cette liste.');
-            return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+            return $this->redirectToRoute('app_wishlists_show', ['id' => $wishlist->getId()]);
         }
 
-        $userIds = $request->request->get('user_ids');
-        if (is_array($userIds)) {
-            $users = new ArrayCollection();
+        // Récupérer les noms d'utilisateur soumis
+        // On s'attend à recevoir un tableau de strings (les usernames)
+        $usernames = $request->request->get('usernames', []);
+        if (!is_array($usernames)) {
+            // Si c'est une seule chaîne, on le transforme en tableau
+            $usernames = [$usernames];
+        }
 
-            foreach ($userIds as $userId) {                
-                $user = $entityManager->getRepository(User::class)->find($userId);                
-                if ($user) {                    
-                    $user->addInvitation(new Invitation($wishlist, $this->getUser(), $user));
-                }
+        $invalidUsernames = [];
+        foreach ($usernames as $username) {
+            $username = trim($username);
+            if (empty($username)) {
+                continue;
+            }
+            $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $username]);
+            if (!$user) {
+                $invalidUsernames[] = $username;
+            } else {
+                // Ajouter une invitation pour l'utilisateur trouvé
+                $user->addInvitation(new Invitation($wishlist, $this->getUser(), $user));
             }
         }
+
+        if (count($invalidUsernames) > 0) {
+            $this->addFlash('error', 'Les noms d\'utilisateur suivants n\'existent pas : ' . implode(', ', $invalidUsernames));
+            return $this->redirectToRoute('app_wishlists_show', ['id' => $wishlist->getId()]);
+        }
+
         $entityManager->flush();
 
-
-
         $this->addFlash('success', 'La liste de souhaits a été partagée avec succès.');
-        return $this->redirectToRoute('app_wishlist_show', ['id' => $wishlist->getId()]);
+        return $this->redirectToRoute('app_wishlists_show', ['id' => $wishlist->getId()]);
     }
 }

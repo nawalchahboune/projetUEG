@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accès refusé{% endblock %}
+
+{% block body %}
+    <div class="error-page">
+        <h1>403 - Accès refusé</h1>
+        <p>Vous n'avez pas les permissions nécessaires pour accéder à cette page.</p>
+        <a href="{{ path('app_home') }}" class="btn btn-primary">Retour à l'accueil</a>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+     .error-page {
+         text-align: center;
+         margin-top: 50px;
+     }
+     .error-page h1 {
+         font-size: 3rem;
+         color: #ff4d4f;
+     }
+     .error-page p {
+         font-size: 1.2rem;
+         color: #555;
+     }
+     .error-page .btn {
+         margin-top: 20px;
+         padding: 10px 20px;
+         font-size: 1rem;
+         background-color: #007bff;
+         color: #fff;
+         text-decoration: none;
+         border-radius: 5px;
+     }
+     .error-page .btn:hover {
+         background-color: #0056b3;
+     }
+ </style>
+{% endblock %}
