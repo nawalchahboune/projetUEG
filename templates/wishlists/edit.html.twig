@@ -1,56 +1,149 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier ma liste de souhaits{% endblock %}
+{% block title %}Modifier la liste de souhaits{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card">
-                <div class="card-header">
-                    <h1 class="h3 mb-0">Modifier la liste de souhaits</h1>
-                </div>
-                <div class="card-body">
-                    {{ form_start(form) }}
-                    <div class="mb-3">
-                        {{ form_label(form.name, 'Nom de la liste') }}
-                        {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Par exemple: Anniversaire, Noël, Mariage...'}}) }}
-                        {{ form_errors(form.name) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(form.deadline, 'Date limite (optionnelle)') }}
-                        {{ form_widget(form.deadline, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.deadline) }}
-                        <small class="form-text text-muted">Jusqu'à quand cette liste sera-t-elle active?</small>
-                    </div>
-
-                    {% if form.collaborators is defined %}
-                    <div class="mb-3">
-                        {{ form_label(form.collaborators, 'Partagez avec (optionnel)') }}
-                        {{ form_widget(form.collaborators, {'attr': {'class': 'form-select', 'multiple': 'multiple'}} ) }}
-                        {{ form_errors(form.collaborators) }}
-                        <small class="form-text text-muted">Sélectionnez les utilisateurs avec qui vous souhaitez partager cette liste</small>
-                    </div>
-                    {% endif %}
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
-                        <a href="{{ path('app_wishlists_index') }}" class="btn btn-supprimer">Annuler</a>
-                        {# <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i> Enregistrer les modifications
-                        </button> #}
-                    </div>
-                    {{ form_end(form) }}
-                </div>
-            </div>
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow-lg border-light rounded-3">
+        <div class="card-header text-white text-center" style="background-color: #00B8DE;">
+          <h1 class="h3 mb-0">Modifier la liste de souhaits</h1>
         </div>
+        <div class="card-body p-5">
+          {{ form_start(form) }}
+
+          <!-- Champs pour le nom et la date limite -->
+          <div class="mb-4">
+            {{ form_row(form.name) }}
+          </div>
+          <div class="mb-4">
+            {{ form_row(form.deadline) }}
+          </div>
+
+          <!-- Section pour partager avec (ajout dynamique de collaborateurs) -->
+          <div class="mb-4">
+            <label for="collaborator_username" class="fw-bold text-dark">Partager avec</label>
+            <div class="input-group">
+              <input type="text" id="collaborator_username" class="form-control" placeholder="Entrez le username de la personne">
+              <button type="button" id="add_collaborator_btn" class="btn btn-outline-secondary">Ajouter</button>
+            </div>
+            <small class="form-text text-muted">
+              Ajoutez le username de la personne avec laquelle vous souhaitez partager la liste.
+            </small>
+          </div>
+
+          <!-- Zone d'affichage des "boxes" de collaborateurs -->
+          <div id="collaborators_list" class="mb-4">
+            <ul class="list-group"></ul>
+          </div>
+
+          <!-- Champ caché pour stocker les usernames (séparés par une virgule) -->
+          <input type="hidden" id="collaborators_hidden" name="collaborators_hidden" value="">
+
+          <div class="d-grid gap-3 d-md-flex justify-content-md-between mt-4">
+            <a href="{{ path('app_wishlists_index') }}" class="btn btn-outline-dark px-4 py-2 shadow-sm mb-3">
+              <i class="fas fa-times-circle me-2"></i> Annuler
+            </a>
+            <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm mt-3">
+              <i class="fas fa-save me-2"></i> Enregistrer les modifications
+            </button>
+          </div>
+
+          {{ form_end(form) }}
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}
-{% if form.collaborators is defined %}
+  {{ parent() }}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const addBtn = document.getElementById('add_collaborator_btn');
+      const collaboratorInput = document.getElementById('collaborator_username');
+      const collaboratorsList = document.querySelector('#collaborators_list ul');
+      const hiddenField = document.getElementById('collaborators_hidden');
 
-{% endif %}
+      // Update hidden field from the list boxes
+      function updateHiddenField() {
+        const usernames = [];
+        collaboratorsList.querySelectorAll('li').forEach(li => {
+          usernames.push(li.getAttribute('data-username'));
+        });
+        hiddenField.value = usernames.join(',');
+      }
+
+      // Function to add a collaborator box
+      function addCollaboratorBox(username) {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
+        li.setAttribute('data-username', username);
+        li.textContent = username;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.classList.add('btn', 'btn-sm', 'btn-danger');
+        removeBtn.textContent = 'X';
+        removeBtn.addEventListener('click', function() {
+          li.remove();
+          updateHiddenField();
+        });
+        li.appendChild(removeBtn);
+
+        collaboratorsList.appendChild(li);
+        updateHiddenField();
+      }
+
+      // Pre-fill existing collaborators (for debugging, log the value)
+      const existingCollaborators = {{ wishlist.collaborators|map(c => c.username)|json_encode|raw }};
+      console.log("Existing collaborators:", existingCollaborators);
+      existingCollaborators.forEach(username => {
+        addCollaboratorBox(username);
+      });
+
+      // Add new collaborator via AJAX when clicking "Ajouter"
+      addBtn.addEventListener('click', function() {
+        let username = collaboratorInput.value.trim();
+        console.log("Avant nettoyage:", username);
+        // Remove surrounding quotes if present
+        username = username.replace(/^['"]+|['"]+$/g, '');
+        console.log("Après nettoyage:", username);
+
+        if (!username) {
+          alert('Veuillez saisir un username.');
+          return;
+        }
+        // Check if already added
+        if (collaboratorsList.querySelector(`li[data-username="${username}"]`)) {
+          alert('Ce collaborateur est déjà ajouté.');
+          return;
+        }
+        // AJAX call to verify username exists
+        fetch('{{ path("app_check_username") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: 'username=' + encodeURIComponent(username)
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Utilisateur non trouvé');
+          }
+          return response.json();
+        })
+        .then(data => {
+          addCollaboratorBox(username);
+          collaboratorInput.value = '';
+        })
+        .catch(error => {
+          alert('Le username "' + username + '" n\'existe pas.');
+        });
+      });
+    });
+  </script>
 {% endblock %}

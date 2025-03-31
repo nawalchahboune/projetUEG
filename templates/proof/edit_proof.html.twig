@@ -1,7 +1,7 @@
-{# filepath: templates/proof/proof.html.twig #}
+{# filepath: templates/proof/edit_proof.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Gift Proof | GiftWish{% endblock %}
+{% block title %}Edit Proof | GiftWish{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -31,22 +31,22 @@
             <p class="fs-3 fw-bold">${{ item.price }}</p>
         </div>
 
-        <!-- Right side: Proof upload form -->
+        <!-- Right side: Proof edit form -->
         <div class="col-md-7">
             <div class="p-3 rounded" style="background-color: #d7f7cb;">
-                <h4 class="mb-3">Validate your purchase</h4>
-                <form action="{{ path('upload_proof') }}" method="post" enctype="multipart/form-data">
-                    <!-- Hidden input to pass the itemId -->
-                    <input type="hidden" name="itemId" value="{{ itemId }}">
+                <h4 class="mb-3">Edit Your Proof</h4>
+                
+                <form action="{{ path('edit_proof', {'id': proof.id}) }}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="itemId" value="{{ item.id }}">
                     <div class="mb-3">
-                        <label for="proofFile" class="form-label">Upload file (proof of purchase)</label>
+                        <label for="proofFile" class="form-label">Change file (optional)</label>
                         <input type="file" class="form-control" id="proofFile" name="proofFile" accept="image/*">
                     </div>
                     <div class="mb-3">
-                        <label for="congratsMsg" class="form-label">Add a congratulatory message</label>
-                        <textarea class="form-control" id="congratsMsg" name="congratsMsg" rows="3"></textarea>
+                        <label for="congratsMsg" class="form-label">Edit your congratulatory message</label>
+                        <textarea class="form-control" id="congratsMsg" name="congratsMsg" rows="3">{{ proof.congratsMessage }}</textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Validate</button>
+                    <button type="submit" class="btn btn-primary">Update Proof</button>
                 </form>
             </div>
         </div>

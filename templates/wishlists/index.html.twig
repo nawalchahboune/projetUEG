@@ -17,7 +17,6 @@
             align-items: center;
             z-index: 1000;
         }
-
         .share-popup-content {
             background-color: white;
             padding: 20px;
@@ -26,7 +25,6 @@
             max-width: 500px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-
         /* Style pour alignement horizontal des wishlists */
         .wishlist-container {
             display: flex;
@@ -34,13 +32,11 @@
             gap: 15px;
             justify-content: flex-start;
         }
-
         .wishlist-card {
             flex: 0 0 auto;
             width: 340px;
             margin-bottom: 20px;
         }
-
         .hidden {
             display: none !important;
         }
@@ -61,7 +57,7 @@
         </div>
     </div>
 
-    {# Zone d'image avec augmentation de l'espace sous l'image pour pousser la zone vers le bas #}
+    {# Zone d'image avec augmentation de l'espace sous l'image #}
     <div class="profile-header mb-4">
         <img src="{{ asset('images/gifts.jpg') }}" alt="cover pic" class="header-image">
         <div class="profile-pic-container">
@@ -80,66 +76,65 @@
             <div class="alert alert-info">Vous n'avez pas encore créé de liste de souhaits.</div>
         {% else %}
             <div class="wishlist-container">
-               {% for wishlist in wishlists %}
-    <div class="wishlist-card">
-        <div class="card h-100 {% if wishlist.isExpired() %}card-expired{% endif %}">
-            <div class="card-body d-flex flex-column h-100">
-
-                {# Titre de la wishlist #}
-                <h5 class="card-title mb-3">
-                    {{ wishlist.name }}
-                    {% if wishlist.isExpired() %}<span class="badge bg-secondary">Expirée</span>{% endif %}
-                </h5>
-
-                {# Zone contenant la date et les boutons #}
-                <div class="mt-auto py-3">
-                    <p class="card-text">
-                        <strong>Date limite:</strong> 
-                        <span class="{% if wishlist.isExpired() %}text-danger{% endif %}">
-                            {{ wishlist.deadline ? wishlist.deadline|date('d/m/Y') : 'Non définie' }}
-                        </span>
-                    </p>
-                </div>
-
-                <!-- Wishlist Actions -->
-                <div class="btn-group d-flex justify-content-between">
-                    <a href="{{ path('app_wishlist_show', {'id': wishlist.id}) }}" class="btn btn-primary flex-fill me-1 text-center">
-                        <i class="fas fa-eye"></i>
-                    </a>
-                    
-                    {% if not wishlist.isExpired() %}
-                        <a href="{{ path('app_wishlists_edit', {'id': wishlist.id}) }}" class="btn btn-warning flex-fill me-1 text-center">
-                            <i class="fas fa-pencil-alt"></i>
-                        </a>
-                    {% else %}
-                        <button class="btn btn-warning flex-fill me-1 text-center opacity-50" disabled>
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                    {% endif %}
-                    
-                    <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste?');" style="display: inline;" class="flex-fill me-1">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
-                        <button type="submit" class="btn btn-supprimer w-100 text-center">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                    
-                    {% if not wishlist.isExpired() %}
-                        <button class="btn btn-creer flex-fill text-center share-wishlist-btn" data-id="{{ wishlist.id }}">
-                            <i class="fas fa-share-alt"></i>
-                        </button>
-                    {% else %}
-                        <button class="btn btn-creer flex-fill text-center opacity-50" disabled>
-                            <i class="fas fa-share-alt"></i>
-                        </button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-{% endfor %}
+                {% for wishlist in wishlists %}
+                    <div class="wishlist-card">
+                        <div class="card h-100 {% if wishlist.isExpired() %}card-expired{% endif %}">
+                            <div class="card-body d-flex flex-column h-100">
+                                {# Titre de la wishlist #}
+                                <h5 class="card-title mb-3">
+                                    {{ wishlist.name }}
+                                    {% if wishlist.isExpired() %}<span class="badge bg-secondary">Expirée</span>{% endif %}
+                                </h5>
+                                {# Zone contenant la date et les boutons #}
+                                <div class="mt-auto py-3">
+                                    <p class="card-text">
+                                        <strong>Date limite:</strong> 
+                                        <span class="{% if wishlist.isExpired() %}text-danger{% endif %}">
+                                            {{ wishlist.deadline ? wishlist.deadline|date('d/m/Y') : 'Non définie' }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <!-- Wishlist Actions -->
+                                <div class="btn-group d-flex justify-content-between">
+                                    <a href="{{ path('app_wishlist_show', {'id': wishlist.id}) }}" class="btn btn-primary flex-fill me-1 text-center">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    
+                                    {% if not wishlist.isExpired() %}
+                                        <a href="{{ path('app_wishlists_edit', {'id': wishlist.id}) }}" class="btn btn-warning flex-fill me-1 text-center">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                    {% else %}
+                                        <button class="btn btn-warning flex-fill me-1 text-center opacity-50" disabled>
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                    {% endif %}
+                                    
+                                    <form method="post" action="{{ path('app_wishlist_delete_wishlist', {'id': wishlist.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette liste?');" style="display: inline;" class="flex-fill me-1">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ wishlist.id) }}">
+                                        <button type="submit" class="btn btn-supprimer w-100 text-center">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                    
+                                    {% if not wishlist.isExpired() %}
+                                        <button class="btn btn-creer flex-fill text-center share-wishlist-btn" data-id="{{ wishlist.id }}">
+                                            <i class="fas fa-share-alt"></i>
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-creer flex-fill text-center opacity-50" disabled>
+                                            <i class="fas fa-share-alt"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         {% endif %}
+
+        {# Section pour les listes partagées avec moi #}
         <h4>Listes partagées avec moi</h4>
         {% if wishlistsIamCollaborator is empty %}
             <div class="alert alert-info">Aucune liste de souhaits partagée avec vous.</div>
@@ -149,15 +144,14 @@
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
                             <div class="card-body d-flex flex-column">
-                                <!-- Wishlist Title and Deadline -->
+                                <!-- Titre et date limite -->
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <h5 class="card-title mb-0">{{ wishlist.name }}</h5>
                                     <p class="card-text mb-0">
                                         Date limite: {{ wishlist.deadline ? wishlist.deadline|date('d/m/Y') : 'Non définie' }}
                                     </p>
                                 </div>
-
-                                <!-- Wishlist Actions -->
+                                <!-- Actions -->
                                 <div class="btn-group d-flex justify-content-between">
                                     <a href="{{ path('app_wishlist_show', {'id': wishlist.id}) }}" class="btn btn-primary flex-fill me-1 text-center">
                                         <i class="fas fa-eye"></i>
@@ -172,9 +166,55 @@
                 {% endfor %}
             </div>
         {% endif %}
+
+        {# Section pour afficher Mes invitations #}
+        <h4>Mes invitations</h4>
+        {% if invitations is empty %}
+            <div class="alert alert-info">Vous n'avez pas d'invitations en attente.</div>
+        {% else %}
+            <div class="row">
+                {% for invitation in invitations %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ invitation.wishlist.name }}</h5>
+                                <p class="card-text">
+                                    <strong>Expéditeur :</strong> {{ invitation.sender.username }}
+                                </p>
+                                <p class="card-text">
+                                    <strong>Statut :</strong> 
+                                    {% if invitation.accepted is same as(null) %}
+                                        En attente
+                                    {% elseif invitation.accepted == true %}
+                                        Acceptée
+                                    {% elseif invitation.accepted == false %}
+                                        Refusée
+                                    {% endif %}
+                                </p>
+                                <a href="{{ path('invitation_show', {'id': invitation.id}) }}" class="btn btn-primary mb-2">Voir l'invitation</a>
+                                {% if invitation.accepted is same as(null) %}
+                                    <div class="action-buttons" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                                        <form action="{{ path('invitation_accept', {'id': invitation.id}) }}" method="post" style="margin: 0;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('accept' ~ invitation.id) }}">
+                                            <button type="submit" class="btn btn-success">Accepter l'invitation</button>
+                                        </form>
+                                        <form action="{{ path('invitation_reject', {'id': invitation.id}) }}" method="post" style="margin: 0;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ invitation.id) }}">
+                                            <button type="submit" class="btn btn-danger">Refuser l'invitation</button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
     </div>
 
-    <!-- Popups centralisés à l'extérieur de la structure des cartes -->
+    {# Popups de partage pour les wishlists #}
     {% for wishlist in wishlists %}
         <div id="share-popup-{{ wishlist.id }}" class="share-popup hidden">
             <div class="share-popup-content">
@@ -201,19 +241,14 @@
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
-                    
-                    <!-- Conteneur pour les suggestions d'utilisateurs -->
-                    <div 
-                        id="user-suggestions-{{ wishlist.id }}" 
-                        class="user-suggestions mt-2"
-                    ></div>
+                    <!-- Suggestions d'utilisateurs -->
+                    <div id="user-suggestions-{{ wishlist.id }}" class="user-suggestions mt-2"></div>
                 </div>
             </div>
         </div>
     {% endfor %}
 </div>
 {% endblock %}
-
 
 {% block javascripts %}
 {{ parent() }}
@@ -224,25 +259,20 @@
     
         // Gestion des boutons de partage
         const shareButtons = document.querySelectorAll('.share-wishlist-btn');
-
         shareButtons.forEach(button => {
             button.addEventListener('click', function (event) {
                 event.stopPropagation();
-    
-                // Masquer tous les autres popups
                 const popups = document.querySelectorAll('.share-popup');
                 popups.forEach(popup => {
                     popup.classList.add('hidden');
                 });
-    
-                // Afficher le popup correspondant
                 const wishlistId = this.getAttribute('data-id');
                 const popup = document.getElementById('share-popup-' + wishlistId);
                 popup.classList.remove('hidden');
             });
         });
     
-        // Gestion des boutons de fermeture
+        // Boutons de fermeture des popups
         const closeButtons = document.querySelectorAll('.close-popup-btn');
         closeButtons.forEach(button => {
             button.addEventListener('click', function () {
@@ -252,37 +282,30 @@
             });
         });
     
-        // Gestion de la recherche d'utilisateurs
+        // Recherche d'utilisateurs pour le partage
         const friendInputs = document.querySelectorAll('.friend-input');
         friendInputs.forEach(input => {
             let searchTimeout;
-    
             input.addEventListener('input', function () {
                 const searchValue = this.value.trim();
                 const wishlistId = this.id.replace('friend-username-', '');
                 const suggestionsContainer = document.getElementById(`user-suggestions-${wishlistId}`);
-    
                 clearTimeout(searchTimeout);
-    
                 if (searchValue.length < 2) {
                     suggestionsContainer.innerHTML = '';
                     return;
                 }
-    
                 searchTimeout = setTimeout(() => {
                     fetch(`/api/users/search?query=${encodeURIComponent(searchValue)}`)
                         .then(response => response.json())
                         .then(users => {
                             suggestionsContainer.innerHTML = '';
-    
                             if (users.length === 0) {
                                 suggestionsContainer.innerHTML = '<p class="text-muted">Aucun utilisateur trouvé</p>';
                                 return;
                             }
-    
                             const suggestionsList = document.createElement('div');
                             suggestionsList.className = 'list-group';
-    
                             users.forEach(user => {
                                 const suggestionItem = document.createElement('a');
                                 suggestionItem.href = '#';
@@ -293,16 +316,13 @@
                                         <small>${user.email}</small>
                                     </div>
                                 `;
-    
                                 suggestionItem.addEventListener('click', function (e) {
                                     e.preventDefault();
                                     input.value = user.username;
                                     suggestionsContainer.innerHTML = '';
                                 });
-    
                                 suggestionsList.appendChild(suggestionItem);
                             });
-    
                             suggestionsContainer.appendChild(suggestionsList);
                         })
                         .catch(error => {
@@ -313,21 +333,18 @@
             });
         });
     
-        // Gestion du bouton d'ajout d'ami
+        // Bouton d'ajout d'ami
         const addFriendButtons = document.querySelectorAll('.add-friend-btn');
         addFriendButtons.forEach(button => {
             button.addEventListener('click', function (event) {
                 event.preventDefault();
-    
                 const wishlistId = this.getAttribute('data-id');
                 const inputField = document.getElementById(`friend-username-${wishlistId}`);
                 const username = inputField.value.trim();
-    
                 if (!username) {
                     alert('Veuillez entrer un nom d\'utilisateur.');
                     return;
                 }
-    
                 fetch('/api/wishlist/add-collaborator', {
                     method: 'POST',
                     headers: {
@@ -355,16 +372,14 @@
             });
         });
     
-        // Ajout du bouton de copie du lien
+        // Bouton de copie du lien
         const copyButtons = document.querySelectorAll('.copy-link-btn');
         copyButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const wishlistId = this.getAttribute('data-id');
                 const linkInput = document.getElementById(`share-link-${wishlistId}`);
-                
                 linkInput.select();
                 document.execCommand('copy');
-                
                 this.textContent = 'Copié !';
                 setTimeout(() => {
                     this.textContent = 'Copy Link';

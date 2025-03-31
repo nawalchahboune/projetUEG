@@ -3,7 +3,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Item; // Assuming you have an Item entity
+use App\Entity\Item;
 use App\Entity\Proof;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,41 +18,35 @@ class ProofController extends AbstractController
     #[Route('/gift/proof/{id}', name: 'gift_proof_form', methods: ['GET'])]
     public function showProofForm(int $id, EntityManagerInterface $entityManager): Response
     {
-        // Fetch the actual item from database
+        // Récupération de l'item en base
         $item = $entityManager->getRepository(Item::class)->find($id);
         
-        // Check if item exists
         if (!$item) {
             throw new NotFoundHttpException('Item not found');
         }
         
-        // Render template with actual item data
+        // Affichage du formulaire de preuve
         return $this->render('proof/proof.html.twig', [
             'itemId' => $id,
-            'item' => $item, // Pass the actual item to the template
+            'item' => $item,
         ]);
     }
 
     #[Route('/gift/proof', name: 'upload_proof', methods: ['POST'])]
     public function uploadProof(Request $request, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
     {
-        // Get the item ID from the form
         $itemId = $request->request->get('itemId');
-        
-        // Validate the item exists
         $item = $entityManager->getRepository(Item::class)->find($itemId);
         
         if (!$item) {
             $this->addFlash('error', 'Invalid item');
-            return $this->redirectToRoute('homepage'); // Or wherever appropriate
+            return $this->redirectToRoute('homepage'); // Redirection vers la page d'accueil ou autre
         }
         
-        // Continue with file upload as before
         $uploadedFile = $request->files->get('proofFile');
         $congratsMsg = $request->request->get('congratsMsg');
 
         if ($uploadedFile) {
-            // Create a safe filename
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
             $safeFilename = $slugger->slug($originalFilename);
             $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
@@ -63,21 +57,22 @@ class ProofController extends AbstractController
                     $newFilename
                 );
                 
-                // Update the item status
-                $item->setStatus('purchased');
+                // Met à jour le statut de l'item
+                $item->setHasPurchased(true);
                 
-                // Create and populate the Proof entity
+                // Création et configuration de l'entité Proof
                 $proof = new Proof();
                 $proof->setItem($item);
                 $proof->setProofImagePath($newFilename);
                 $proof->setMessage($congratsMsg);
                 
-                // Set the current user as the buyer
                 if ($this->getUser()) {
                     $proof->setBuyer($this->getUser());
                 }
                 
                 $entityManager->persist($proof);
+                $item->setProof($proof);
+
                 $entityManager->flush();
                 
                 $this->addFlash('success', 'Proof uploaded successfully!');
@@ -89,7 +84,50 @@ class ProofController extends AbstractController
             $this->addFlash('error', 'No file selected. Please choose a file to upload.');
         }
 
-        // Redirect back to the proof form or another page
+        // Redirection vers le formulaire de preuve (ou une autre page)
         return $this->redirectToRoute('gift_proof_form', ['id' => $itemId]);
+    }
+
+    #[Route('/gift/proof/{id}/edit', name: 'edit_proof', methods: ['GET', 'POST'])]
+    public function editProof(Request $request, Proof $proof, SluggerInterface $slugger, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifie que l'utilisateur connecté est bien le buyer
+        if (!$this->getUser() || $this->getUser()->getId() !== $proof->getBuyer()?->getId()) {
+            throw $this->createAccessDeniedException('You are not allowed to edit this proof.');
+        }
+
+        if ($request->isMethod('POST')) {
+            $congratsMsg = $request->request->get('congratsMsg');
+            $uploadedFile = $request->files->get('proofFile');
+            
+            if ($uploadedFile) {
+                $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
+
+                try {
+                    $uploadedFile->move(
+                        $this->getParameter('proofs_directory'),
+                        $newFilename
+                    );
+                    $proof->setProofImagePath($newFilename);
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Could not upload file. Please try again.');
+                }
+            }
+            $proof->setMessage($congratsMsg);
+
+            $entityManager->flush();
+            $this->addFlash('success', 'Proof updated successfully!');
+
+            // Redirection vers le formulaire de preuve de l'item
+            return $this->redirectToRoute('gift_proof_form', ['id' => $proof->getItem()->getId()]);
+        }
+
+        // Affichage du formulaire d'édition de la preuve
+        return $this->render('proof/edit_proof.html.twig', [
+            'proof' => $proof,
+            'item' => $proof->getItem(),
+        ]);
     }
 }

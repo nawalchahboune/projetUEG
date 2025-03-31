@@ -35,6 +35,10 @@ class Item
     #[ORM\JoinColumn(nullable: false)]
     private ?Wishlist $wishlist = null;
 
+    #[ORM\OneToOne(mappedBy: 'item', targetEntity: Proof::class, cascade: ['persist', 'remove'])]
+    private ?Proof $proof = null;
+
+
     public function __construct(string $name = null, string $description = null, float $price = null, string $url = null)
     {
         $this->name = $name;
@@ -117,5 +121,27 @@ class Item
     public function hasPurchased(): ?bool
     {
         return $this->hasPurchased;
+    }
+
+    public function getProof(): ?Proof
+    {
+        return $this->proof;
+    }
+
+    public function setProof(?Proof $proof): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($proof === null && $this->proof !== null) {
+            $this->proof->setItem(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($proof !== null && $proof->getItem() !== $this) {
+            $proof->setItem($this);
+        }
+
+        $this->proof = $proof;
+
+        return $this;
     }
 }

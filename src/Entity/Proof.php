@@ -23,8 +23,8 @@ class Proof
     #[ORM\JoinColumn(nullable: true)]
     private ?User $buyer = null;
 
-    #[ORM\ManyToOne(targetEntity: Item::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: Item::class, inversedBy: 'proofs')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Item $item = null;
 
     #[ORM\Column]
