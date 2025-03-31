@@ -41,6 +41,18 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
             ])
+            // ->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            //     $form = $event->getForm();
+            //     $data = $form->getData();
+            //     $username = $data['username'] ?? null;
+
+            //     if ($username) {
+            //         $userRepository = $event->getForm()->getConfig()->getOption('user_repository');
+            //         if ($userRepository->findOneBy(['username' => $username])) {
+            //             $form->get('username')->addError(new FormError('Ce nom d\'utilisateur est déjà pris.'));
+            //         }
+            //     }
+            // })
             ->add('firstName', TextType::class, [
                 'label' => 'Prénom',
                 'attr' => [
