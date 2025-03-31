@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Résultats de recherche{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Résultats de recherche pour "{{ query }}"</h1>
+    
+    <form class="mb-4" action="{{ path('app_search') }}" method="get" class="d-flex search-container">
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" value="{{ query }}" placeholder="Rechercher des articles..." aria-label="Rechercher">
+            <button class="btn btn-primary search-button" type="submit">Rechercher</button>
+        </div>
+    </form>
+    
+    {% if results is empty and query %}
+        <div class="alert alert-info">
+            Aucun résultat trouvé pour "{{ query }}".
+        </div>
+    {% elseif results %}
+        <div class="row">
+            {% for item in results %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ item.name }}</h5>
+                            {% if item.description %}
+                                <p class="card-text">{{ item.description }}</p>
+                            {% endif %}
+                            <p class="card-text"><strong>Prix:</strong> {{ item.price }} €</p>
+                            {% if item.url %}
+                                <a href="{{ item.url }}" target="_blank" class="btn btn-primary">Voir le produit</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -85,6 +85,19 @@
                                     {{ wishlist.name }}
                                     {% if wishlist.isExpired() %}<span class="badge bg-secondary">Expirée</span>{% endif %}
                                 </h5>
+
+                                {% if wishlist.collaborators|length > 0 %}
+                                    <div class="mt-2 mb-3">
+                                        <h6 class="text-muted">Partagée avec:</h6>
+                                        <div class="d-flex flex-wrap">
+                                            {% for collaborator in wishlist.collaborators %}
+                                                <span class="badge bg-info me-1 mb-1">{{ collaborator.username }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                {% endif %}
+                                
                                 {# Zone contenant la date et les boutons #}
                                 <div class="mt-auto py-3">
                                     <p class="card-text">
@@ -150,6 +163,9 @@
                                     <p class="card-text mb-0">
                                         Date limite: {{ wishlist.deadline ? wishlist.deadline|date('d/m/Y') : 'Non définie' }}
                                     </p>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="mb-1"><strong>Partagée par:</strong> {{ wishlist.owner.username }}</p>
                                 </div>
                                 <!-- Actions -->
                                 <div class="btn-group d-flex justify-content-between">

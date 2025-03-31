@@ -6,7 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\FormItem\ItemFromType;
+use App\Repository\ItemRepository;
+
 
 class HomeController extends AbstractController
 {
@@ -24,17 +25,19 @@ class HomeController extends AbstractController
         ]);
     }
     
-    #[Route('/search', name: 'app_gift_search')]
-    public function search(Request $request): Response
+    #[Route('/search', name: 'app_search', methods: ['GET'])]
+    public function search(Request $request, ItemRepository $itemRepository): Response
     {
         $query = $request->query->get('q', '');
+        $results = [];
         
-        // In a real application, you would search your database here
-        // For now, we'll just pass the query to the template
+        if ($query) {
+            $results = $itemRepository->searchItems($query);
+        }
         
-        return $this->render('home/search_results.html.twig', [
+        return $this->render('home/search.html.twig', [
             'query' => $query,
-            'results' => [], // This would be filled with actual search results
+            'results' => $results,
         ]);
     }
 }

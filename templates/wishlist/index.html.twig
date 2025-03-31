@@ -173,6 +173,34 @@
         .item-card.purchased:hover .purchased-info {
             display: block;
         }
+        /* Style pour la section des collaborateurs */
+.wishlist-collaborators {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.wishlist-collaborators h5 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #495057;
+}
+
+.wishlist-owner {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+/* Badges pour les collaborateurs */
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+    color: white;
+    padding: 5px 10px;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
     </style>
 {% endblock %}
 
@@ -180,13 +208,42 @@
 <div class="shared-wishlist-container">
     <!-- Header avec titre et actions -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="shared-title mb-0">
-            {{ wishlist.name }}
-            {% if wishlist.isExpired() %}
-                <span class="badge bg-secondary">Expirée</span>
-            {% endif %}
-        </h1>
-        
+<div class="wishlist-header">
+    <h1>{{ wishlist.name }}</h1>
+    
+    {# Affichage du propriétaire si je suis collaborateur #}
+    {% if app.user != wishlist.owner %}
+        <p class="wishlist-owner">
+            <i class="fas fa-user"></i> 
+            Liste créée par <strong>{{ wishlist.owner.username }}</strong>
+        </p>
+    {% endif %}
+    
+    {# Affichage des collaborateurs si je suis propriétaire #}
+    {% if app.user == wishlist.owner and wishlist.collaborators|length > 0 %}
+        <div class="wishlist-collaborators mb-3">
+            <h5>Partagée avec :</h5>
+            <div class="d-flex flex-wrap">
+                {% for collaborator in wishlist.collaborators %}
+                    <span class="badge bg-info me-2 mb-1">{{ collaborator.username }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    {# Affichage de la date limite #}
+    <p class="wishlist-deadline {% if wishlist.isExpired() %}text-danger{% endif %}">
+        <i class="far fa-calendar-alt"></i>
+        {% if wishlist.deadline %}
+            Date limite: {{ wishlist.deadline|date('d/m/Y') }}
+            {% if wishlist.isExpired() %} <span class="badge bg-danger">Expirée</span>{% endif %}
+        {% else %}
+            Sans date limite
+        {% endif %}
+    </p>
+    
+
+</div>
         <div class="btn-group-actions">
             <a href="{{ path('app_wishlists_index') }}" class="btn btn-back">
                 <i class="fas fa-arrow-left"></i> Retour à mes listes

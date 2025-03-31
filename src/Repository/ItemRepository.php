@@ -28,4 +28,15 @@ class ItemRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function searchItems(string $query): array
+    {
+        // Use a manual query selecting only the fields we need
+        return $this->createQueryBuilder('i')
+            ->select('i.id', 'i.name', 'i.description', 'i.price', 'i.hasPurchased', 'i.url')
+            ->where('i.name LIKE :query OR i.description LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult(); // Return array instead of entities to avoid relationship loading
+    }
 }
