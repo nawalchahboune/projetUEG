@@ -79,6 +79,18 @@ To log in with the admin account, use the following credentials:
 - username: admin@gmail.com
 - password: admin2025
 
+## Technologies Used
+
+Frontend: HTML, CSS, JavaScript (specific framework to be specified)
+
+Backend: Chosen language and framework (e.g., Node.js, PHP, or others)
+
+Database: Management system (MySQL, PostgreSQL, etc.)
+
+Modeling Tools: UML software for design
+
+Development Environment: Docker for container management and orchestration (mentioned in encountered issues)
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
