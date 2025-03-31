@@ -1,5 +1,10 @@
 <?php
-
+/**
+ *
+ * @authors 
+ * - YAO Jean-David (Binôme 13)
+ * - AROUISSI Khaoula (Binôme 13)
+ */
 namespace App\Entity;
 
 use App\Repository\TestRepository;

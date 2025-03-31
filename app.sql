@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db:3306
--- Generation Time: Mar 31, 2025 at 08:37 PM
+-- Generation Time: Mar 31, 2025 at 10:01 PM
 -- Server version: 8.1.0
 -- PHP Version: 8.2.27
 
@@ -166,11 +166,12 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `first_name`, `last_name`, `username`, `email`, `created_at`, `updated_at`, `password`, `photo`, `lock_status`, `type`) VALUES
-(6, 'Easton', 'Walker', 'friesen.leone', 'lenny73@fisher.com', '2025-01-07 00:44:46', '2025-02-10 08:08:41', '$2y$13$S3uUFrYd6qWMdCDa/i.Phuz3AEj4qYaK2mkDmuBJdijOBsOCBmO9y', NULL, 0, 'regular'),
-(7, 'Hailie', 'Rowe', 'wilkinson.kamille', 'nshanahan@stamm.com', '2025-02-22 00:58:21', '2025-01-15 17:50:13', '$2y$13$mKBrIkWokfDnvqhwyzx2reRnv4oX0WtmQs/3fFql8Jpv0fXbErBva', NULL, 0, 'regular'),
-(8, 'Ian', 'Boehm', 'mante.chloe', 'junior35@lockman.com', '2025-01-14 16:43:51', '2025-03-24 00:41:50', '$2y$13$UKFvbUjPdtfyFAneCgsRveg9r4JPzmKp9Ku4lV6j1EAIloQaoEWwq', NULL, 0, 'regular'),
-(9, 'Flavio', 'Rice', 'peter.ondricka', 'deborah.dooley@gmail.com', '2025-03-10 02:19:18', '2025-03-14 15:07:50', '$2y$13$cz4NASewW.xtgduLszZ9ZuOYlaFMuM/Dp67n2rNZG9fZCPTPqIYFm', NULL, 0, 'regular'),
-(10, 'Lindsey', 'Sporer', 'jordy50', 'howe.jeffrey@rutherford.com', '2025-01-11 22:56:42', '2025-03-13 12:23:49', '$2y$13$ZIkpHjq8Wdl29zBEwB474OXNLDb7rXN7TMBO7/WspX/3v65uVeiDO', NULL, 0, 'regular');
+(6, 'Easton', 'Walker', 'friesen.leone', 'lenny73@fisher.com', '2025-01-07 00:44:46', '2025-02-10 08:08:41', '$2y$13$S3uUFrYd6qWMdCDa/i.Phuz3AEj4qYaK2mkDmuBJdijOBsOCBmO9y', NULL, 0, 'user'),
+(7, 'Hailie', 'Rowe', 'wilkinson.kamille', 'nshanahan@stamm.com', '2025-02-22 00:58:21', '2025-01-15 17:50:13', '$2y$13$mKBrIkWokfDnvqhwyzx2reRnv4oX0WtmQs/3fFql8Jpv0fXbErBva', NULL, 0, 'user'),
+(8, 'Ian', 'Boehm', 'mante.chloe', 'junior35@lockman.com', '2025-01-14 16:43:51', '2025-03-24 00:41:50', '$2y$13$UKFvbUjPdtfyFAneCgsRveg9r4JPzmKp9Ku4lV6j1EAIloQaoEWwq', NULL, 0, 'user'),
+(9, 'Flavio', 'Rice', 'peter.ondricka', 'deborah.dooley@gmail.com', '2025-03-10 02:19:18', '2025-03-14 15:07:50', '$2y$13$cz4NASewW.xtgduLszZ9ZuOYlaFMuM/Dp67n2rNZG9fZCPTPqIYFm', NULL, 0, 'user'),
+(10, 'Lindsey', 'Sporer', 'jordy50', 'howe.jeffrey@rutherford.com', '2025-01-11 22:56:42', '2025-03-13 12:23:49', '$2y$13$ZIkpHjq8Wdl29zBEwB474OXNLDb7rXN7TMBO7/WspX/3v65uVeiDO', NULL, 0, 'user'),
+(11, 'admin', 'ADMIN', 'admin2025', 'admin@gmail.com', '2025-03-31 21:58:28', NULL, '$2y$13$1hWy2Gu7AUgdYogcaFB5S.9xs4rQQdVtGpT1GhGIW7fIbibg9Yuqe', NULL, 0, 'admin');
 
 -- --------------------------------------------------------
 
@@ -299,7 +300,7 @@ ALTER TABLE `proof`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `wishlist`

@@ -1,5 +1,11 @@
 <?php
-
+/**
+ *
+ * @authors 
+ * - CHAHBOUNE Nawal (Binôme 15)
+ * - GHALLAB Houda (Binôme 15)
+ *
+*/
 namespace App\Controller;
 
 use App\Entity\User;

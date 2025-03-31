@@ -32,6 +32,9 @@ Follow these steps to set up the project locally:
      ```
      DATABASE_URL="mysql://username:password@127.0.0.1:3306/app"
      ```
+The username and password used in the project are:
+- username: root
+- password: root_PWD-iaw
 
 4. Install front-end assets:
    ```bash
@@ -73,9 +76,8 @@ To share a wishlist with other users, you can specify their usernames when creat
 
 ### Admin account
 To log in with the admin account, use the following credentials:
-- username: adminusr
-- password: adminpwd
-
+- username: admin@gmail.com
+- password: admin2025
 
 ## Contributing
 

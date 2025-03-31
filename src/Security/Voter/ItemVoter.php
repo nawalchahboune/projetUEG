@@ -1,4 +1,11 @@
 <?php
+/**
+ *
+ * @authors 
+ * - CHAHBOUNE Nawal (Binôme 15)
+ * - GHALLAB Houda (Binôme 15)
+ *
+*/
 namespace App\Security\Voter;
 
 use App\Entity\Item;

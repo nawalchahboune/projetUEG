@@ -1,5 +1,11 @@
 <?php
-
+/**
+ *
+ * @authors 
+ * - CHAHBOUNE Nawal (Binôme 15)
+ * - GHALLAB Houda (Binôme 15)
+ *
+*/
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
