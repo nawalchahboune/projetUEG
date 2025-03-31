@@ -239,7 +239,7 @@
                 <input type="text" id="share-link-{{ wishlist.id }}" value="{{ url('app_wishlist_public', {'token': wishlist.publicToken}) }}" readonly class="form-control mb-2">
                 <button class="btn btn-info copy-link-btn mb-2" data-id="{{ wishlist.id }}">Copy Link</button>
                 <button class="btn btn-secondary close-popup-btn mb-3" data-id="{{ wishlist.id }}">Close</button>
-                <div class="add-friends-container">
+                {# <div class="add-friends-container">
                     <h3>Share with Users</h3>
                     <div class="input-with-button d-flex mb-2">
                         <input 
@@ -256,7 +256,7 @@
                         >
                             <i class="fas fa-plus"></i>
                         </button>
-                    </div>
+                    </div> #}
                     <!-- Suggestions d'utilisateurs -->
                     <div id="user-suggestions-{{ wishlist.id }}" class="user-suggestions mt-2"></div>
                 </div>
