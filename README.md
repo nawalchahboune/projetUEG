@@ -76,7 +76,7 @@ To share a wishlist with other users, you can specify their usernames when creat
 
 ### Admin account
 To log in with the admin account, use the following credentials:
-- username: admin@gmail.com
+- mail: admin@gmail.com
 - password: admin2025
 
 ## Technologies Used
